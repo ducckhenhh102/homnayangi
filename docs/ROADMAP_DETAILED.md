@@ -124,14 +124,14 @@ graph TD
 
 **Mục tiêu:** dữ liệu quán nội bộ có mô hình chuẩn và migration tái lập được.
 
-- [ ] **6.1 — Tạo Neon project.** Chọn region gần người dùng phù hợp; lấy **pooled** và **direct** connection strings. **Đạt:** lưu local `.env` (không commit), không rò rỉ URL.
+- [x] **6.1 — Tạo Neon project.** Chọn region gần người dùng phù hợp; lấy **pooled** và **direct** connection strings. **Đạt:** lưu local `.env` (không commit), không rò rỉ URL.
 - [x] **6.2 — Cài Prisma.** Chốt Prisma major hiện hành, dùng config JS (`prisma.config.js/.mjs`) nếu hỗ trợ; `schema.prisma`, Prisma Client và driver adapter theo tài liệu Neon/Prisma. **Đạt:** `prisma validate` (hoặc lệnh tương đương) pass.
 - [x] **6.3 — Tạo enums/code phân loại.** `couple/friends/solo`, `snack/meal/drinking`; không dùng label tiếng Việt làm ID. **Đạt:** mã không sai chính tả qua frontend/backend.
 - [x] **6.4 — Tạo tables core.** `restaurants`, `foods`, `restaurant_foods`, `dining_types`, `restaurant_dining_types`, `companion_types`, `restaurant_companion_types`. **Đạt:** các FK/unique/index tồn tại.
 - [x] **6.5 — Thêm tables hỗ trợ.** `restaurant_images`, `food_images` (Cloudinary metadata), `users`, `restaurant_provider_links` (chỉ provider ID). **Đạt:** không dùng trường chứa ảnh nhị phân hoặc cache Google không được phép.
-- [ ] **6.6 — Migration trên local/development.** `prisma migrate dev --name init` với direct URL theo cấu hình version; commit migration. **Đạt:** migrate từ database sạch thành công.
+- [x] **6.6 — Migration trên local/development.** `prisma migrate dev --name init` với direct URL theo cấu hình version; commit migration. **Đạt:** migrate từ database sạch thành công.
 - [x] **6.7 — Seed.** Chèn 3 companion, 3 dining, danh mục món; nhập một vài **quán được xác minh** hoặc demo có nhãn rõ. **Đạt:** query DB thấy liên kết đúng.
-- [ ] **6.8 — Test DB.** Thử unique slug, giới hạn tọa độ, giá min/max, category nhiều-nhiều, rollback khi vi phạm. **Đạt:** ràng buộc hoạt động.
+- [x] **6.8 — Test DB.** Thử unique slug, giới hạn tọa độ, giá min/max, category nhiều-nhiều, rollback khi vi phạm. **Đạt:** ràng buộc hoạt động.
 - [x] **6.9 — Commit.** `feat(db): add Neon Prisma schema and seed`. **Đạt:** mỗi schema migration có trong Git.
 
 **DoD:** không lưu ảnh trong Neon; database có seed để phát triển nhưng không công bố quán demo như quán thật.
@@ -348,7 +348,7 @@ Quy tắc: commit sau khi chạy test/kiểm tra của **một đơn vị công 
 | 2026-11-14 | Phase 3.1-3.6 | Design system tokens, Empty/Error/Skeleton/Card | `401e60f` | Foodie Adventure design system passed |
 | 2026-11-14 | Phase 4.1-4.7 | 3-step Discovery Wizard, Context, Tests | `11abbf1` | Companion, DiningType, Location (GPS/Manual), tests 100% |
 | 2026-11-14 | Phase 5.1-5.7 | Express API, Helmet, CORS, Error handling, Health, tests | `86d4133` | `/health`, `/discovery/options` pass 3/3 test |
-| 2026-11-14 | Phase 6.2-6.5, 6.7, 6.9 | Prisma schema, singleton DB, seed script, valid schema | `fc6db75` | Sẵn sàng cho kết nối Neon DB ở bước 6.1 & 6.6 |
+| 2026-11-14 | Phase 6.1-6.9 | Kết nối Neon PostgreSQL Singapore, migration init, seed data, DB tests pass 100% | `a38b28c` | Phase 6 hoàn thành trọn vẹn |
 
 ## H. Prompt mẫu để nhờ AI tiếp tục chính xác
 
