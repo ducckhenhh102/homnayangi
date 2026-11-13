@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum RestaurantStatus {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+}
+
+model Restaurant {
+  id           String           @id @default(uuid())
+  name         String           @db.VarChar(200)
+  slug         String           @unique @db.VarChar(240)
+  description  String?          @db.Text
+  address      String           @db.Text
+  latitude     Float
+  longitude    Float
+  priceMin     Int?             @map("price_min")
+  priceMax     Int?             @map("price_max")
+  status       RestaurantStatus @default(DRAFT)
+  openingHours Json?            @map("opening_hours")
+  createdById  String?          @map("created_by_id")
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+
+  createdBy      User?                      @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  foods          RestaurantFood[]
+  diningTypes    RestaurantDiningType[]
+  companionTypes RestaurantCompanionType[]
+  images         RestaurantImage[]
+  providerLinks  RestaurantProviderLink[]
+
+  @@index([status])
+  @@index([slug])
+  @@index([latitude, longitude])
+  @@map("restaurants")
+}
+
+model Food {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(200)
+  slug        String   @unique @db.VarChar(240)
+  description String?  @db.Text
+  category    String?  @db.VarChar(100)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  restaurantFoods RestaurantFood[]
+  images          FoodImage[]
+
+  @@index([slug])
+  @@map("foods")
+}
+
+model RestaurantFood {
+  restaurantId String   @map("restaurant_id")
+  foodId       String   @map("food_id")
+  priceVnd     Int?     @map("price_vnd")
+  isAvailable  Boolean? @default(true) @map("is_available")
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  food       Food       @relation(fields: [foodId], references: [id], onDelete: Cascade)
+
+  @@id([restaurantId, foodId])
+  @@map("restaurant_foods")
+}
+
+model DiningType {
+  id          String  @id // 'snack', 'meal', 'drinking'
+  name        String  @db.VarChar(100)
+  description String? @db.Text
+
+  restaurants RestaurantDiningType[]
+
+  @@map("dining_types")
+}
+
+model RestaurantDiningType {
+  restaurantId String @map("restaurant_id")
+  diningTypeId String @map("dining_type_id")
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  diningType DiningType @relation(fields: [diningTypeId], references: [id], onDelete: Cascade)
+
+  @@id([restaurantId, diningTypeId])
+  @@index([restaurantId, diningTypeId])
+  @@map("restaurant_dining_types")
+}
+
+model CompanionType {
+  id          String  @id // 'couple', 'friends', 'solo'
+  name        String  @db.VarChar(100)
+  description String? @db.Text
+
+  restaurants RestaurantCompanionType[]
+
+  @@map("companion_types")
+}
+
+model RestaurantCompanionType {
+  restaurantId    String @map("restaurant_id")
+  companionTypeId String @map("companion_type_id")
+  suitabilityScore Int?  @default(100) @map("suitability_score") // 0..100
+
+  restaurant    Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  companionType CompanionType @relation(fields: [companionTypeId], references: [id], onDelete: Cascade)
+
+  @@id([restaurantId, companionTypeId])
+  @@index([restaurantId, companionTypeId])
+  @@map("restaurant_companion_types")
+}
+
+model RestaurantImage {
+  id                 String   @id @default(uuid())
+  restaurantId       String   @map("restaurant_id")
+  cloudinaryPublicId String   @unique @map("cloudinary_public_id")
+  secureUrl          String   @map("secure_url") @db.Text
+  width              Int?
+  height             Int?
+  altText            String?  @map("alt_text") @db.VarChar(255)
+  sortOrder          Int      @default(0) @map("sort_order")
+  rightsSource       String?  @map("rights_source") @db.VarChar(255)
+  uploadedBy         String?  @map("uploaded_by") @db.VarChar(100)
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId, sortOrder])
+  @@map("restaurant_images")
+}
+
+model FoodImage {
+  id                 String   @id @default(uuid())
+  foodId             String   @map("food_id")
+  cloudinaryPublicId String   @unique @map("cloudinary_public_id")
+  secureUrl          String   @map("secure_url") @db.Text
+  width              Int?
+  height             Int?
+  altText            String?  @map("alt_text") @db.VarChar(255)
+  sortOrder          Int      @default(0) @map("sort_order")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  food Food @relation(fields: [foodId], references: [id], onDelete: Cascade)
+
+  @@index([foodId, sortOrder])
+  @@map("food_images")
+}
+
+model RestaurantProviderLink {
+  id              String    @id @default(uuid())
+  restaurantId    String    @map("restaurant_id")
+  provider        String    @db.VarChar(50) // e.g. 'google'
+  providerPlaceId String    @map("provider_place_id") @db.VarChar(255)
+  verifiedAt      DateTime? @map("verified_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerPlaceId])
+  @@index([provider, providerPlaceId])
+  @@map("restaurant_provider_links")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  name         String?  @db.VarChar(100)
+  role         String   @default("admin") @db.VarChar(50)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  managedRestaurants Restaurant[]
+
+  @@map("users")
+}
