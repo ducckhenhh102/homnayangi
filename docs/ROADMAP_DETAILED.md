@@ -45,11 +45,11 @@ graph TD
 
 **Mục tiêu:** máy tính phát triển sẵn sàng, hiểu MVP và giới hạn dịch vụ.
 
-- [ ] **0.1 — Kiểm tra phiên bản.** Trong PowerShell/VS Code Terminal chạy: `node -v`, `npm -v`, `git --version`. Chọn Node LTS đáp ứng yêu cầu phiên bản Vite/Prisma hiện hành. **Đạt:** ba lệnh trả version, không có lỗi không nhận lệnh.
-- [ ] **0.2 — Kiểm tra VS Code và terminal.** Mở được thư mục D:\ hoặc nơi lưu repo, tạo và xóa file thử. **Đạt:** VS Code terminal dùng được.
-- [ ] **0.3 — Kiểm tra tài khoản.** GitHub, Vercel, Neon, Cloudinary; Google Cloud *chưa cần bật billing* ở phase này. **Đạt:** đăng nhập dashboard và kiểm tra hạn mức miễn phí theo ngày dùng.
-- [ ] **0.4 — Đọc yêu cầu và quyết định phạm vi.** Xác nhận 3 companion codes, 3 dining codes, radius `1..10`, món/quán, admin CRUD, Hybrid có thể tắt. **Đạt:** không tự thêm tính năng ngoài MVP.
-- [ ] **0.5 — Chọn khu vực thử nghiệm.** Chỉ sử dụng quán có địa chỉ/tọa độ xác minh; dữ liệu demo phải gắn nhãn. **Đạt:** có danh sách nguồn nhập dữ liệu đáng tin cậy.
+- [x] **0.1 — Kiểm tra phiên bản.** Trong PowerShell/VS Code Terminal chạy: `node -v`, `npm -v`, `git --version`. Chọn Node LTS đáp ứng yêu cầu phiên bản Vite/Prisma hiện hành. **Đạt:** ba lệnh trả version, không có lỗi không nhận lệnh.
+- [x] **0.2 — Kiểm tra VS Code và terminal.** Mở được thư mục D:\ hoặc nơi lưu repo, tạo và xóa file thử. **Đạt:** VS Code terminal dùng được.
+- [x] **0.3 — Kiểm tra tài khoản.** GitHub, Vercel, Neon, Cloudinary; Google Cloud *chưa cần bật billing* ở phase này. **Đạt:** đăng nhập dashboard và kiểm tra hạn mức miễn phí theo ngày dùng.
+- [x] **0.4 — Đọc yêu cầu và quyết định phạm vi.** Xác nhận 3 companion codes, 3 dining codes, radius `1..10`, món/quán, admin CRUD, Hybrid có thể tắt. **Đạt:** không tự thêm tính năng ngoài MVP.
+- [x] **0.5 — Chọn khu vực thử nghiệm.** Chỉ sử dụng quán có địa chỉ/tọa độ xác minh; dữ liệu demo phải gắn nhãn. **Đạt:** có danh sách nguồn nhập dữ liệu đáng tin cậy.
 
 **DoD:** công cụ hoạt động, tài khoản sẵn sàng, không có bí mật nào trong repo.
 
@@ -57,11 +57,11 @@ graph TD
 
 **Mục tiêu:** một repo `hom-nay-an-gi` chứa hai ứng dụng và bộ docs.
 
-- [ ] **1.1 — Tạo thư mục và Git.** PowerShell: `mkdir hom-nay-an-gi`, `cd hom-nay-an-gi`, `git init`. **Đạt:** `git status` trả nhánh hiện tại.
-- [ ] **1.2 — Tạo `.gitignore`.** Loại trừ `node_modules/`, `dist/`, `.env`, `.env.*` nhạy cảm (cho phép `.env.example`), `.vercel/`, logs, coverage. **Đạt:** `.env` không nằm trong `git status`.
-- [ ] **1.3 — Thêm README và `docs/`.** Chép tài liệu trong gói này vào repo. README có mô tả, stack, cách chạy (sẽ cập nhật). **Đạt:** VS Code hiển thị docs, link Markdown hoạt động.
-- [ ] **1.4 — Commit đầu tiên.** `git add .`, `git commit -m "chore: initialize repository and project docs"`. **Đạt:** `git log -1 --oneline` thấy commit.
-- [ ] **1.5 — Tạo GitHub repository.** Repo không chứa secrets; thêm `remote origin` và push nhánh chính theo hướng dẫn GitHub. **Đạt:** mở repo trên GitHub thấy README và docs.
+- [x] **1.1 — Tạo thư mục và Git.** PowerShell: `mkdir hom-nay-an-gi`, `cd hom-nay-an-gi`, `git init`. **Đạt:** `git status` trả nhánh hiện tại.
+- [x] **1.2 — Tạo `.gitignore`.** Loại trừ `node_modules/`, `dist/`, `.env`, `.env.*` nhạy cảm (cho phép `.env.example`), `.vercel/`, logs, coverage. **Đạt:** `.env` không nằm trong `git status`.
+- [x] **1.3 — Thêm README và `docs/`.** Chép tài liệu trong gói này vào repo. README có mô tả, stack, cách chạy (sẽ cập nhật). **Đạt:** VS Code hiển thị docs, link Markdown hoạt động.
+- [x] **1.4 — Commit đầu tiên.** `git add .`, `git commit -m "chore: initialize repository and project docs"`. **Đạt:** `git log -1 --oneline` thấy commit.
+- [x] **1.5 — Tạo GitHub repository.** Repo không chứa secrets; thêm `remote origin` và push nhánh chính theo hướng dẫn GitHub. **Đạt:** mở repo trên GitHub thấy README và docs.
 
 **DoD:** repo tồn tại, docs được version-control, branch và remote rõ ràng.
 
@@ -69,13 +69,13 @@ graph TD
 
 **Mục tiêu:** web chạy trên local, responsive cơ bản, chưa cần backend.
 
-- [ ] **2.1 — Khởi tạo frontend JS.** Ở thư mục gốc: `npm create vite@latest frontend -- --template react` (chạy khi `frontend/` chưa tồn tại hoặc thư mục trống); chọn **JavaScript**, không TypeScript. **Đạt:** `frontend/package.json`, `src/main.jsx`.
-- [ ] **2.2 — Chạy dev.** `cd frontend`, `npm install`, `npm run dev`. **Đạt:** truy cập Vite local, không lỗi console.
-- [ ] **2.3 — Dọn mã mẫu đúng chỗ.** Thay logo/counter của Vite bằng một trang `HomePage` tối thiểu. Không xóa cấu hình cần thiết. **Đạt:** hiển thị tiêu đề “Hôm Nay Ăn Gì?”.
-- [ ] **2.4 — Cài Tailwind theo đúng phiên bản hiện hành.** Ưu tiên tài liệu chính thức cho React Vite, vì quy trình cài có thể thay đổi giữa các major version. **Đạt:** dùng được utility class trong `.jsx`.
-- [ ] **2.5 — Cài Router, khung trang.** Dùng React Router với `/`, `/explore`, `/wheel`, `/restaurants/:id`, `/admin/login` (placeholder ban đầu). **Đạt:** click route và refresh local không lỗi.
-- [ ] **2.6 — Tạo shared layout.** Header, Footer, `Container`, `Button`, `Input`, `PageTitle` theo nhu cầu. **Đạt:** component import dùng lại được, không duplicate CSS.
-- [ ] **2.7 — Commit frontend foundation.** `chore(frontend): scaffold React Vite JavaScript app`; `feat(ui): add Tailwind and shared layout`. **Đạt:** 2 commit tách chức năng.
+- [x] **2.1 — Khởi tạo frontend JS.** Ở thư mục gốc: `npm create vite@latest frontend -- --template react` (chạy khi `frontend/` chưa tồn tại hoặc thư mục trống); chọn **JavaScript**, không TypeScript. **Đạt:** `frontend/package.json`, `src/main.jsx`.
+- [x] **2.2 — Chạy dev.** `cd frontend`, `npm install`, `npm run dev`. **Đạt:** truy cập Vite local, không lỗi console.
+- [x] **2.3 — Dọn mã mẫu đúng chỗ.** Thay logo/counter của Vite bằng một trang `HomePage` tối thiểu. Không xóa cấu hình cần thiết. **Đạt:** hiển thị tiêu đề “Hôm Nay Ăn Gì?”.
+- [x] **2.4 — Cài Tailwind theo đúng phiên bản hiện hành.** Ưu tiên tài liệu chính thức cho React Vite, vì quy trình cài có thể thay đổi giữa các major version. **Đạt:** dùng được utility class trong `.jsx`.
+- [x] **2.5 — Cài Router, khung trang.** Dùng React Router với `/`, `/explore`, `/wheel`, `/restaurants/:id`, `/admin/login` (placeholder ban đầu). **Đạt:** click route và refresh local không lỗi.
+- [x] **2.6 — Tạo shared layout.** Header, Footer, `Container`, `Button`, `Input`, `PageTitle` theo nhu cầu. **Đạt:** component import dùng lại được, không duplicate CSS.
+- [x] **2.7 — Commit frontend foundation.** `chore(frontend): scaffold React Vite JavaScript app`; `feat(ui): add Tailwind and shared layout`. **Đạt:** 2 commit tách chức năng.
 
 **DoD:** frontend chạy ở local, mobile không tràn ngang, JS/JSX, không secret.
 
@@ -83,12 +83,12 @@ graph TD
 
 **Mục tiêu:** giao diện “Foodie Adventure” nhất quán, đáp ứng accessibility cơ bản.
 
-- [ ] **3.1 — Tạo tokens.** Màu `#FF6B4A`, `#FFB84D`, `#FFF9F2`, text `#252525`, border `#EAE5DF`; font Be Vietnam Pro; spacing và radius. **Đạt:** màu dùng qua tokens, không hard-code khắp nơi.
-- [ ] **3.2 — Component states.** Button với `loading/disabled`, Input có label/error, Card có hover/focus. **Đạt:** keyboard focus nhìn rõ và disabled thật sự không bấm được.
-- [ ] **3.3 — Responsive shells.** Container mobile padding 16px, desktop max width, header/mobile nav. **Đạt:** 360px, tablet, desktop không overflow.
-- [ ] **3.4 — Trang chủ.** Hero copy, 3 lựa chọn cùng ai, 3 nhóm ăn; CTA khám phá và vòng quay. **Đạt:** hiểu sản phẩm sau khi nhìn màn hình đầu.
-- [ ] **3.5 — Trạng thái tổng quát.** Loading Skeleton, EmptyState, ErrorState, toast/inline feedback. **Đạt:** có text rõ ràng, không chỉ spinner.
-- [ ] **3.6 — Commit.** `feat(ui): establish Foodie Adventure design system`. **Đạt:** màn hình mobile và desktop được kiểm tra.
+- [x] **3.1 — Tạo tokens.** Màu `#FF6B4A`, `#FFB84D`, `#FFF9F2`, text `#252525`, border `#EAE5DF`; font Be Vietnam Pro; spacing và radius. **Đạt:** màu dùng qua tokens, không hard-code khắp nơi.
+- [x] **3.2 — Component states.** Button với `loading/disabled`, Input có label/error, Card có hover/focus. **Đạt:** keyboard focus nhìn rõ và disabled thật sự không bấm được.
+- [x] **3.3 — Responsive shells.** Container mobile padding 16px, desktop max width, header/mobile nav. **Đạt:** 360px, tablet, desktop không overflow.
+- [x] **3.4 — Trang chủ.** Hero copy, 3 lựa chọn cùng ai, 3 nhóm ăn; CTA khám phá và vòng quay. **Đạt:** hiểu sản phẩm sau khi nhìn màn hình đầu.
+- [x] **3.5 — Trạng thái tổng quát.** Loading Skeleton, EmptyState, ErrorState, toast/inline feedback. **Đạt:** có text rõ ràng, không chỉ spinner.
+- [x] **3.6 — Commit.** `feat(ui): establish Foodie Adventure design system`. **Đạt:** màn hình mobile và desktop được kiểm tra.
 
 **DoD:** không phụ thuộc ảnh giả đóng vai quán thật; tương phản CTA hợp lý; có focus visible và reduced-motion guideline.
 
@@ -96,13 +96,13 @@ graph TD
 
 **Mục tiêu:** lựa chọn phù hợp trước khi truy vấn quán.
 
-- [ ] **4.1 — CompanionPicker.** `couple/friends/solo`, mỗi ô có icon, nhãn, trạng thái chọn. **Đạt:** chọn một mục duy nhất, tương tác keyboard.
-- [ ] **4.2 — DiningTypePicker.** `snack/meal/drinking`; không đánh đồng `drinking` với hành vi tiêu thụ rượu bắt buộc. **Đạt:** một nhóm ăn hiện hành, nhiều nhóm có thể gắn một quán trong DB.
-- [ ] **4.3 — LocationPicker dạng mock.** Radio GPS hoặc vị trí thủ công, ô nhập tìm địa điểm chưa nối provider, control bán kính từ 1 đến 10. **Đạt:** không đi bước kết quả nếu chưa có tọa độ chọn thật hoặc mock hợp lệ.
-- [ ] **4.4 — Store lựa chọn.** Zustand hoặc React Context nếu state nhỏ; chỉ ghi tùy chọn không nhạy cảm vào localStorage. **Đạt:** về trang trước còn lựa chọn.
-- [ ] **4.5 — Điều hướng.** Sau ba bước, đi `/explore`; hiển thị tóm tắt filter và nút sửa lựa chọn. **Đạt:** không làm mất selection.
-- [ ] **4.6 — Unit test wizard.** Thử chọn/đổi companion, loại ăn, bán kính ngoài range, GPS denied. **Đạt:** tất cả cases pass.
-- [ ] **4.7 — Commit.** `feat(discovery): implement three-step preference wizard`. **Đạt:** thử end-to-end UI không cần API.
+- [x] **4.1 — CompanionPicker.** `couple/friends/solo`, mỗi ô có icon, nhãn, trạng thái chọn. **Đạt:** chọn một mục duy nhất, tương tác keyboard.
+- [x] **4.2 — DiningTypePicker.** `snack/meal/drinking`; không đánh đồng `drinking` với hành vi tiêu thụ rượu bắt buộc. **Đạt:** một nhóm ăn hiện hành, nhiều nhóm có thể gắn một quán trong DB.
+- [x] **4.3 — LocationPicker dạng mock.** Radio GPS hoặc vị trí thủ công, ô nhập tìm địa điểm chưa nối provider, control bán kính từ 1 đến 10. **Đạt:** không đi bước kết quả nếu chưa có tọa độ chọn thật hoặc mock hợp lệ.
+- [x] **4.4 — Store lựa chọn.** Zustand hoặc React Context nếu state nhỏ; chỉ ghi tùy chọn không nhạy cảm vào localStorage. **Đạt:** về trang trước còn lựa chọn.
+- [x] **4.5 — Điều hướng.** Sau ba bước, đi `/explore`; hiển thị tóm tắt filter và nút sửa lựa chọn. **Đạt:** không làm mất selection.
+- [x] **4.6 — Unit test wizard.** Thử chọn/đổi companion, loại ăn, bán kính ngoài range, GPS denied. **Đạt:** tất cả cases pass.
+- [x] **4.7 — Commit.** `feat(discovery): implement three-step preference wizard`. **Đạt:** thử end-to-end UI không cần API.
 
 **DoD:** người dùng đi được luồng chọn 3 bước không đăng nhập.
 
@@ -110,13 +110,13 @@ graph TD
 
 **Mục tiêu:** backend JS có cấu trúc module, kiểm tra health, lỗi có format chuẩn.
 
-- [ ] **5.1 — Khởi tạo backend.** Trong `backend/`: `npm init -y`, chọn ESM qua `"type": "module"` trong package.json. **Đạt:** chạy được script Node.js.
-- [ ] **5.2 — Cài cơ bản.** `npm install express cors helmet zod dotenv` và công cụ dev/test phù hợp. **Đạt:** không có lỗi import.
-- [ ] **5.3 — Tách app/server.** `src/app.js` export Express app; `backend/dev.js` gọi `listen()` chỉ local. Vercel hiện có hỗ trợ tự nhận diện `src/app.js` có default export, nên chưa cần `api/index.js`. **Đạt:** 2 entrypoint dùng chung app.
-- [ ] **5.4 — Health + response.** `GET /api/v1/health` trả `{ data: { status: 'ok' } }`, error handler trả JSON thống nhất. **Đạt:** kiểm thử qua curl hoặc trình duyệt.
-- [ ] **5.5 — Middleware.** `helmet`, CORS theo origin, parse JSON size limit, Zod query/body validation, 404. **Đạt:** request input sai trả 400, không 500.
-- [ ] **5.6 — Automated test.** Unit/integration test health, 404, validation. **Đạt:** `npm test` pass (script phải được cấu hình).
-- [ ] **5.7 — Commit.** `feat(api): initialize Express API and validation`. **Đạt:** frontend có thể gọi health qua env dev.
+- [x] **5.1 — Khởi tạo backend.** Trong `backend/`: `npm init -y`, chọn ESM qua `"type": "module"` trong package.json. **Đạt:** chạy được script Node.js.
+- [x] **5.2 — Cài cơ bản.** `npm install express cors helmet zod dotenv` và công cụ dev/test phù hợp. **Đạt:** không có lỗi import.
+- [x] **5.3 — Tách app/server.** `src/app.js` export Express app; `backend/dev.js` gọi `listen()` chỉ local. Vercel hiện có hỗ trợ tự nhận diện `src/app.js` có default export, nên chưa cần `api/index.js`. **Đạt:** 2 entrypoint dùng chung app.
+- [x] **5.4 — Health + response.** `GET /api/v1/health` trả `{ data: { status: 'ok' } }`, error handler trả JSON thống nhất. **Đạt:** kiểm thử qua curl hoặc trình duyệt.
+- [x] **5.5 — Middleware.** `helmet`, CORS theo origin, parse JSON size limit, Zod query/body validation, 404. **Đạt:** request input sai trả 400, không 500.
+- [x] **5.6 — Automated test.** Unit/integration test health, 404, validation. **Đạt:** `npm test` pass (script phải được cấu hình).
+- [x] **5.7 — Commit.** `feat(api): initialize Express API and validation`. **Đạt:** frontend có thể gọi health qua env dev.
 
 **DoD:** API local hoạt động, không cần database để chạy health.
 
@@ -125,14 +125,14 @@ graph TD
 **Mục tiêu:** dữ liệu quán nội bộ có mô hình chuẩn và migration tái lập được.
 
 - [ ] **6.1 — Tạo Neon project.** Chọn region gần người dùng phù hợp; lấy **pooled** và **direct** connection strings. **Đạt:** lưu local `.env` (không commit), không rò rỉ URL.
-- [ ] **6.2 — Cài Prisma.** Chốt Prisma major hiện hành, dùng config JS (`prisma.config.js/.mjs`) nếu hỗ trợ; `schema.prisma`, Prisma Client và driver adapter theo tài liệu Neon/Prisma. **Đạt:** `prisma validate` (hoặc lệnh tương đương) pass.
-- [ ] **6.3 — Tạo enums/code phân loại.** `couple/friends/solo`, `snack/meal/drinking`; không dùng label tiếng Việt làm ID. **Đạt:** mã không sai chính tả qua frontend/backend.
-- [ ] **6.4 — Tạo tables core.** `restaurants`, `foods`, `restaurant_foods`, `dining_types`, `restaurant_dining_types`, `companion_types`, `restaurant_companion_types`. **Đạt:** các FK/unique/index tồn tại.
-- [ ] **6.5 — Thêm tables hỗ trợ.** `restaurant_images`, `food_images` (Cloudinary metadata), `users`, `restaurant_provider_links` (chỉ provider ID). **Đạt:** không dùng trường chứa ảnh nhị phân hoặc cache Google không được phép.
+- [x] **6.2 — Cài Prisma.** Chốt Prisma major hiện hành, dùng config JS (`prisma.config.js/.mjs`) nếu hỗ trợ; `schema.prisma`, Prisma Client và driver adapter theo tài liệu Neon/Prisma. **Đạt:** `prisma validate` (hoặc lệnh tương đương) pass.
+- [x] **6.3 — Tạo enums/code phân loại.** `couple/friends/solo`, `snack/meal/drinking`; không dùng label tiếng Việt làm ID. **Đạt:** mã không sai chính tả qua frontend/backend.
+- [x] **6.4 — Tạo tables core.** `restaurants`, `foods`, `restaurant_foods`, `dining_types`, `restaurant_dining_types`, `companion_types`, `restaurant_companion_types`. **Đạt:** các FK/unique/index tồn tại.
+- [x] **6.5 — Thêm tables hỗ trợ.** `restaurant_images`, `food_images` (Cloudinary metadata), `users`, `restaurant_provider_links` (chỉ provider ID). **Đạt:** không dùng trường chứa ảnh nhị phân hoặc cache Google không được phép.
 - [ ] **6.6 — Migration trên local/development.** `prisma migrate dev --name init` với direct URL theo cấu hình version; commit migration. **Đạt:** migrate từ database sạch thành công.
-- [ ] **6.7 — Seed.** Chèn 3 companion, 3 dining, danh mục món; nhập một vài **quán được xác minh** hoặc demo có nhãn rõ. **Đạt:** query DB thấy liên kết đúng.
+- [x] **6.7 — Seed.** Chèn 3 companion, 3 dining, danh mục món; nhập một vài **quán được xác minh** hoặc demo có nhãn rõ. **Đạt:** query DB thấy liên kết đúng.
 - [ ] **6.8 — Test DB.** Thử unique slug, giới hạn tọa độ, giá min/max, category nhiều-nhiều, rollback khi vi phạm. **Đạt:** ràng buộc hoạt động.
-- [ ] **6.9 — Commit.** `feat(db): add Neon Prisma schema and seed`. **Đạt:** mỗi schema migration có trong Git.
+- [x] **6.9 — Commit.** `feat(db): add Neon Prisma schema and seed`. **Đạt:** mỗi schema migration có trong Git.
 
 **DoD:** không lưu ảnh trong Neon; database có seed để phát triển nhưng không công bố quán demo như quán thật.
 
@@ -342,7 +342,13 @@ Quy tắc: commit sau khi chạy test/kiểm tra của **một đơn vị công 
 
 | Ngày | Bước | Kết quả kiểm tra | Commit hash | Ghi chú/lỗi còn lại |
 |---|---|---|---|---|
-| YYYY-MM-DD | 1.1 | `git status` OK | `abc1234` | Ví dụ; xóa dòng khi dùng thật |
+| 2026-11-14 | Phase 0 & 1 | Node/npm/git OK, `.gitignore` an toàn, push remote OK | `a4020ea` | Initialized repo, docs, `.gitignore` |
+| 2026-11-14 | Phase 2.1-2.2 | Vite React JavaScript app scaffolded | `8507156` | Local Vite dev/build passed |
+| 2026-11-14 | Phase 2.4-2.7 | Tailwind CSS + Router + Shared Layout | `441f171` | Setup Tailwind v4, navbar, footer, router routes |
+| 2026-11-14 | Phase 3.1-3.6 | Design system tokens, Empty/Error/Skeleton/Card | `401e60f` | Foodie Adventure design system passed |
+| 2026-11-14 | Phase 4.1-4.7 | 3-step Discovery Wizard, Context, Tests | `11abbf1` | Companion, DiningType, Location (GPS/Manual), tests 100% |
+| 2026-11-14 | Phase 5.1-5.7 | Express API, Helmet, CORS, Error handling, Health, tests | `86d4133` | `/health`, `/discovery/options` pass 3/3 test |
+| 2026-11-14 | Phase 6.2-6.5, 6.7, 6.9 | Prisma schema, singleton DB, seed script, valid schema | `fc6db75` | Sẵn sàng cho kết nối Neon DB ở bước 6.1 & 6.6 |
 
 ## H. Prompt mẫu để nhờ AI tiếp tục chính xác
 
