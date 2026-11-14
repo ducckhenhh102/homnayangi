@@ -169,13 +169,13 @@ graph TD
 
 **Mục tiêu:** upload, hiển thị, đổi và xóa ảnh có xác thực.
 
-- [ ] **9.1 — Tạo Cloudinary account.** Lấy cloud name, API key, API secret; ghi tại backend `.env`. **Đạt:** `CLOUDINARY_API_SECRET` không có ở FE/Git.
-- [ ] **9.2 — Upload signature.** Endpoint chỉ admin, server ký giới hạn folder, resource image, timestamp. **Đạt:** user không đăng nhập không lấy được chữ ký.
-- [ ] **9.3 — Frontend upload ảnh.** Chọn ảnh, preview, kiểm size/type, upload trực tiếp Cloudinary với signed params; hiển thị progress/lỗi. **Đạt:** file không đi qua Vercel Function làm bộ đệm.
-- [ ] **9.4 — Ghi metadata.** Express xác minh asset/public_id thuộc namespace và gắn `restaurant_images` hoặc `food_images`. **Đạt:** Neon lưu URL/public ID, không lưu file.
-- [ ] **9.5 — Hiển thị ảnh tối ưu.** `alt`, 4:3, lazy load, ảnh phù hợp kích thước màn hình. **Đạt:** trang `/explore` có ảnh đúng quán.
-- [ ] **9.6 — Xóa ảnh và xử lý lỗi.** Xác minh quyền, xoá Cloudinary và cập nhật DB an toàn; xử lý orphan assets. **Đạt:** không xóa asset của quán khác.
-- [ ] **9.7 — Commit.** `feat(media): add secure Cloudinary image uploads`. **Đạt:** ít nhất một quán có ảnh thật qua admin.
+- [x] **9.1 — Tạo Cloudinary account.** Lấy cloud name, API key, API secret; ghi tại backend `.env`. **Đạt:** `CLOUDINARY_API_SECRET` không có ở FE/Git.
+- [x] **9.2 — Upload signature.** Endpoint chỉ admin, server ký giới hạn folder, resource image, timestamp. **Đạt:** user không đăng nhập không lấy được chữ ký.
+- [x] **9.3 — Frontend upload ảnh.** Chọn ảnh, preview, kiểm size/type, upload trực tiếp Cloudinary với signed params; hiển thị progress/lỗi. **Đạt:** file không đi qua Vercel Function làm bộ đệm.
+- [x] **9.4 — Ghi metadata.** Express xác minh asset/public_id thuộc namespace và gắn `restaurant_images` hoặc `food_images`. **Đạt:** Neon lưu URL/public ID, không lưu file.
+- [x] **9.5 — Hiển thị ảnh tối ưu.** `alt`, 4:3, lazy load, ảnh phù hợp kích thước màn hình. **Đạt:** trang `/explore` có ảnh đúng quán.
+- [x] **9.6 — Xóa ảnh và xử lý lỗi.** Xác minh quyền, xoá Cloudinary và cập nhật DB an toàn; xử lý orphan assets. **Đạt:** không xóa asset của quán khác.
+- [x] **9.7 — Commit.** `feat(media): add secure Cloudinary image uploads`. **Đạt:** ít nhất một quán có ảnh thật qua admin.
 
 **DoD:** Cloudinary hoạt động; không upload ảnh Google Places về Cloudinary.
 
@@ -351,6 +351,7 @@ Quy tắc: commit sau khi chạy test/kiểm tra của **một đơn vị công 
 | 2026-11-14 | Phase 6.1-6.9 | Kết nối Neon PostgreSQL Singapore, migration init, seed data, DB tests pass 100% | `a38b28c` | Phase 6 hoàn thành trọn vẹn |
 | 2026-11-14 | Phase 7.1-7.6 | Restaurant repository, service, list & detail API, FE Card/List/Detail | `2055d23` | Dữ liệu chạy xuyên suốt Neon -> API -> Frontend |
 | 2026-11-14 | Phase 8.1-8.9 | Admin JWT/bcrypt auth, protected restaurant CRUD, Form UI, 13/13 tests pass | `374e53b` | Quản trị thêm/sửa/ẩn quán trực tiếp từ UI |
+| 2026-11-14 | Phase 9.1-9.7 | Signed Cloudinary upload, image metadata DB attachment, ImageUpload UI | `00e80db` | Tải ảnh trực tiếp lên Cloudinary CDN có chữ ký |
 
 ## H. Prompt mẫu để nhờ AI tiếp tục chính xác
 
