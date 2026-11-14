@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node dev.js",
     "dev": "node --watch dev.js",
+    "build": "prisma generate",
+    "postinstall": "prisma generate",
     "test": "node --test tests/**/*.test.js",
     "import:hanoi": "node scripts/importHanoiRestaurants.js"
   },
