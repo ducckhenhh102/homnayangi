@@ -13,12 +13,6 @@ const DINING_NAME_MAP = {
   drinking: { label: 'Đi nhậu', icon: Beer },
 };
 
-const COMPANION_NAME_MAP = {
-  couple: { label: 'Người yêu', icon: Heart },
-  friends: { label: 'Nhóm bạn', icon: Users },
-  solo: { label: 'Một mình', icon: User },
-};
-
 export default function RestaurantDetailPage() {
   const { id } = useParams();
   const [restaurant, setRestaurant] = useState(null);
@@ -77,7 +71,6 @@ export default function RestaurantDetailPage() {
     description,
     location,
     diningTypes = [],
-    companionTypes = [],
     priceMin,
     priceMax,
     images = [],
@@ -140,17 +133,6 @@ export default function RestaurantDetailPage() {
                       className="px-3 py-1 rounded-full text-xs font-semibold bg-[#FFB84D]/20 text-[#966417]"
                     >
                       {item ? item.label : dt}
-                    </span>
-                  );
-                })}
-                {companionTypes.map((ct) => {
-                  const item = COMPANION_NAME_MAP[ct];
-                  return (
-                    <span
-                      key={ct}
-                      className="px-3 py-1 rounded-full text-xs font-semibold bg-[#FF6B4A]/10 text-[#FF6B4A]"
-                    >
-                      {item ? item.label : ct}
                     </span>
                   );
                 })}

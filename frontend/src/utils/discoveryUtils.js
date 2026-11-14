@@ -1,4 +1,3 @@
-export const VALID_COMPANIONS = ['couple', 'friends', 'solo'];
 export const VALID_DINING_TYPES = ['snack', 'meal', 'drinking'];
 
 export function clampRadius(radius) {
@@ -10,7 +9,6 @@ export function clampRadius(radius) {
 }
 
 export function validatePreferences(prefs = {}) {
-  const companion = VALID_COMPANIONS.includes(prefs.companion) ? prefs.companion : 'couple';
   const diningType = VALID_DINING_TYPES.includes(prefs.diningType) ? prefs.diningType : 'meal';
   const radiusKm = clampRadius(prefs.radiusKm);
 
@@ -19,7 +17,6 @@ export function validatePreferences(prefs = {}) {
   const isLocationValid = !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
 
   return {
-    companion,
     diningType,
     radiusKm,
     isLocationValid,

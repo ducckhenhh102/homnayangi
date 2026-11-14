@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const STORAGE_KEY = 'hnag_discovery_preferences';
 
 const DEFAULT_PREFERENCES = {
-  companion: 'couple', // 'couple' | 'friends' | 'solo'
   diningType: 'meal',  // 'snack' | 'meal' | 'drinking'
   radiusKm: 5,        // 1..10
   location: {
@@ -23,7 +22,6 @@ export function DiscoveryProvider({ children }) {
       if (saved) {
         const parsed = JSON.parse(saved);
         return {
-          companion: parsed.companion || DEFAULT_PREFERENCES.companion,
           diningType: parsed.diningType || DEFAULT_PREFERENCES.diningType,
           radiusKm: Math.min(10, Math.max(1, Number(parsed.radiusKm) || 5)),
           location: parsed.location || DEFAULT_PREFERENCES.location,
@@ -43,10 +41,6 @@ export function DiscoveryProvider({ children }) {
     }
   }, [preferences]);
 
-  const setCompanion = (companion) => {
-    setPreferences((prev) => ({ ...prev, companion }));
-  };
-
   const setDiningType = (diningType) => {
     setPreferences((prev) => ({ ...prev, diningType }));
   };
@@ -64,7 +58,6 @@ export function DiscoveryProvider({ children }) {
     <DiscoveryContext.Provider
       value={{
         preferences,
-        setCompanion,
         setDiningType,
         setRadiusKm,
         setLocation,

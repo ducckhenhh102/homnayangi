@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDiscovery } from '../../context/DiscoveryContext';
-import CompanionPicker from './CompanionPicker';
 import DiningTypePicker from './DiningTypePicker';
 import LocationPicker from './LocationPicker';
 import Button from '../common/Button';
@@ -9,7 +8,7 @@ import { Compass, Disc3 } from 'lucide-react';
 
 export default function DiscoveryWizard() {
   const navigate = useNavigate();
-  const { preferences, setCompanion, setDiningType, setRadiusKm, setLocation } = useDiscovery();
+  const { preferences, setDiningType, setRadiusKm, setLocation } = useDiscovery();
 
   const isLocationValid = Boolean(preferences.location?.lat && preferences.location?.lng);
 
@@ -25,13 +24,7 @@ export default function DiscoveryWizard() {
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#EAE5DF] shadow-[0_6px_24px_rgba(37,37,37,0.06)] space-y-8 max-w-3xl mx-auto">
-      <CompanionPicker
-        value={preferences.companion}
-        onChange={setCompanion}
-      />
-
-      <div className="border-t border-[#EAE5DF]" />
-
+      {/* Bước 1: Nhu cầu ăn uống */}
       <DiningTypePicker
         value={preferences.diningType}
         onChange={setDiningType}
@@ -39,6 +32,7 @@ export default function DiscoveryWizard() {
 
       <div className="border-t border-[#EAE5DF]" />
 
+      {/* Bước 2: Vị trí & Bán kính */}
       <LocationPicker
         location={preferences.location}
         onLocationChange={setLocation}

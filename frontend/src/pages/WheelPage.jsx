@@ -32,7 +32,6 @@ export default function WheelPage() {
         lng: String(preferences.location?.lng || 105.8542),
         radiusKm: String(preferences.radiusKm || 10),
         diningType: preferences.diningType,
-        companion: preferences.companion,
         limit: '20',
       });
 
@@ -93,7 +92,6 @@ export default function WheelPage() {
             lat: preferences.location?.lat || 21.0285,
             lng: preferences.location?.lng || 105.8542,
             radiusKm: preferences.radiusKm || 10,
-            companion: preferences.companion,
             diningType: preferences.diningType,
           },
         }),

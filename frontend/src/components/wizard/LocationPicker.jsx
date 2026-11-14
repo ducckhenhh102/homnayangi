@@ -83,7 +83,7 @@ export default function LocationPicker({ location, onLocationChange, radiusKm, o
   return (
     <div className="space-y-4">
       <label className="block text-sm font-semibold text-[#252525]">
-        Bước 3: Vị trí & Bán kính tìm kiếm (Tối đa 10 km)
+        Bước 2: Vị trí & Bán kính tìm kiếm (Tối đa 10 km)
       </label>
 
       {/* Mode Selection */}

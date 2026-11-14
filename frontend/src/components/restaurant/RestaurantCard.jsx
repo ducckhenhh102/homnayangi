@@ -9,12 +9,6 @@ const DINING_NAME_MAP = {
   drinking: 'Đi nhậu',
 };
 
-const COMPANION_NAME_MAP = {
-  couple: 'Người yêu',
-  friends: 'Nhóm bạn',
-  solo: 'Một mình',
-};
-
 export default function RestaurantCard({ restaurant }) {
   const {
     id,
@@ -23,7 +17,6 @@ export default function RestaurantCard({ restaurant }) {
     address,
     imageUrl,
     diningTypes = [],
-    companionTypes = [],
     priceMin,
     priceMax,
     distanceKm,
@@ -77,14 +70,6 @@ export default function RestaurantCard({ restaurant }) {
               className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-[#FFB84D]/20 text-[#966417]"
             >
               {DINING_NAME_MAP[dt] || dt}
-            </span>
-          ))}
-          {companionTypes.slice(0, 2).map((ct) => (
-            <span
-              key={ct}
-              className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-[#FF6B4A]/10 text-[#FF6B4A]"
-            >
-              {COMPANION_NAME_MAP[ct] || ct}
             </span>
           ))}
         </div>

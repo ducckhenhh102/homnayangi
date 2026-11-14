@@ -26,7 +26,7 @@ export default function DiningTypePicker({ value, onChange }) {
   return (
     <div className="space-y-3">
       <label className="block text-sm font-semibold text-[#252525]">
-        Bước 2: Nhu cầu ăn uống của bạn là gì?
+        Bước 1: Hôm nay bạn muốn ăn gì?
       </label>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" role="radiogroup" aria-label="Chọn phong cách ăn uống">
         {DINING_TYPES.map((item) => {

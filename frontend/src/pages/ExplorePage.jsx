@@ -6,13 +6,7 @@ import RestaurantList from '../components/restaurant/RestaurantList';
 import RestaurantMap from '../components/map/RestaurantMap';
 import { useDiscovery } from '../context/DiscoveryContext';
 import { fetchApi } from '../utils/api';
-import { Heart, Users, User, Coffee, UtensilsCrossed, Beer, MapPin, Disc3, SlidersHorizontal, ArrowLeft } from 'lucide-react';
-
-const COMPANION_LABELS = {
-  couple: { label: 'Người yêu', icon: Heart },
-  friends: { label: 'Nhóm bạn', icon: Users },
-  solo: { label: 'Một mình', icon: User },
-};
+import { Coffee, UtensilsCrossed, Beer, MapPin, Disc3, SlidersHorizontal, ArrowLeft } from 'lucide-react';
 
 const DINING_LABELS = {
   snack: { label: 'Ăn vặt', icon: Coffee },
@@ -28,9 +22,7 @@ export default function ExplorePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const companion = COMPANION_LABELS[preferences.companion] || COMPANION_LABELS.couple;
   const dining = DINING_LABELS[preferences.diningType] || DINING_LABELS.meal;
-  const CompanionIcon = companion.icon;
   const DiningIcon = dining.icon;
 
   const loadRestaurants = async () => {
@@ -44,7 +36,6 @@ export default function ExplorePage() {
         lng: String(preferences.location?.lng || 105.8542),
         radiusKm: String(preferences.radiusKm || 10),
         diningType: preferences.diningType,
-        companion: preferences.companion,
         limit: '20',
         sort: 'distance',
       });
@@ -66,7 +57,6 @@ export default function ExplorePage() {
     preferences.location?.lng,
     preferences.radiusKm,
     preferences.diningType,
-    preferences.companion,
   ]);
 
   return (
@@ -99,11 +89,6 @@ export default function ExplorePage() {
       <div className="p-4 bg-white border border-[#EAE5DF] rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-xs">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-medium text-[#6B6B6B]">Đang lọc:</span>
-          
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FF6B4A]/10 text-[#FF6B4A]">
-            <CompanionIcon className="w-3.5 h-3.5" />
-            <span>{companion.label}</span>
-          </div>
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FFB84D]/20 text-[#252525]">
             <DiningIcon className="w-3.5 h-3.5" />
