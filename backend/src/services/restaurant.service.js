@@ -1,4 +1,5 @@
 import restaurantRepository from '../repositories/restaurant.repository.js';
+import hybridPlacesService from '../integrations/places/places.service.js';
 
 export function formatRestaurant(item) {
   if (!item) return null;
@@ -54,6 +55,10 @@ export const restaurantService = {
   },
 
   async getRestaurantDetail(id) {
+    if (id.startsWith('places:')) {
+      return hybridPlacesService.getPlaceDetail(id);
+    }
+
     // Strip namespace prefix if client requested "internal:<id>"
     const cleanId = id.startsWith('internal:') ? id.replace('internal:', '') : id;
     const item = await restaurantRepository.findById(cleanId);
@@ -69,6 +74,10 @@ export const restaurantService = {
   },
 
   async getNearbyRestaurants(params) {
+    if (process.env.PLACES_ENABLED === 'true') {
+      return hybridPlacesService.getNearbyHybrid(params);
+    }
+
     const { items, total, page, limit, radiusKm } = await restaurantRepository.findNearby(params);
     return {
       data: items.map(formatRestaurant),
