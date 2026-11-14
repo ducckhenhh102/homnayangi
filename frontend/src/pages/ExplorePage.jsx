@@ -6,7 +6,7 @@ import RestaurantList from '../components/restaurant/RestaurantList';
 import RestaurantMap from '../components/map/RestaurantMap';
 import { useDiscovery } from '../context/DiscoveryContext';
 import { fetchApi } from '../utils/api';
-import { Coffee, UtensilsCrossed, Beer, MapPin, Disc3, SlidersHorizontal, ArrowLeft } from 'lucide-react';
+import { Coffee, UtensilsCrossed, Beer, MapPin, Disc3, SlidersHorizontal, List, Map } from 'lucide-react';
 
 const DINING_LABELS = {
   snack: { label: 'Ăn vặt', icon: Coffee },
@@ -30,7 +30,6 @@ export default function ExplorePage() {
       setLoading(true);
       setError(null);
 
-      // Query nearby restaurants with current coordinates & radius
       const params = new URLSearchParams({
         lat: String(preferences.location?.lat || 21.0285),
         lng: String(preferences.location?.lng || 105.8542),
@@ -60,85 +59,71 @@ export default function ExplorePage() {
   ]);
 
   return (
-    <Container className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#FF6B4A] hover:underline mb-2"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Thay đổi tiêu chí
-          </Link>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#252525]">
-            Địa điểm gợi ý cho bạn
-          </h1>
-        </div>
-
-        <Button
-          variant="accent"
-          size="md"
-          onClick={() => navigate('/wheel')}
-        >
-          <Disc3 className="w-4 h-4 mr-2" />
-          Vòng quay chọn ngẫu nhiên
-        </Button>
-      </div>
-
-      {/* Filter summary bar */}
-      <div className="p-4 bg-white border border-[#EAE5DF] rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-xs">
+    <Container className="space-y-5">
+      {/* Compact top bar: filter chips + actions */}
+      <div className="p-3.5 bg-white border border-[#EAE5DF] rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-xs">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-[#6B6B6B]">Đang lọc:</span>
-
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FFB84D]/20 text-[#252525]">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#FFB84D]/20 text-[#252525]">
             <DiningIcon className="w-3.5 h-3.5" />
             <span>{dining.label}</span>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-neutral-100 text-[#252525]">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-neutral-100 text-[#252525]">
             <MapPin className="w-3.5 h-3.5 text-[#FF6B4A]" />
             <span className="max-w-[180px] truncate">{preferences.location?.address || 'Vị trí đã chọn'}</span>
             <span className="font-bold">({preferences.radiusKm} km)</span>
           </div>
         </div>
 
-        <Link to="/">
-          <Button variant="secondary" size="sm">
-            <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5" />
-            Sửa bộ lọc
+        <div className="flex items-center gap-2">
+          <Link to="/">
+            <Button variant="ghost" size="sm">
+              <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5" />
+              Sửa bộ lọc
+            </Button>
+          </Link>
+          <Button
+            variant="accent"
+            size="sm"
+            onClick={() => navigate('/wheel')}
+          >
+            <Disc3 className="w-3.5 h-3.5 mr-1.5" />
+            Vòng quay
           </Button>
-        </Link>
+        </div>
       </div>
 
-      {/* View Switcher: Danh sách / Bản đồ */}
-      <div className="flex items-center justify-between border-b border-[#EAE5DF] pb-3">
-        <div className="flex gap-2">
+      {/* View Switcher + Results header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#252525]">
+          Quán ngon gần bạn
+        </h1>
+
+        <div className="flex gap-1 p-1 bg-white border border-[#EAE5DF] rounded-xl">
           <button
             type="button"
             onClick={() => setActiveTab('list')}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
               activeTab === 'list'
                 ? 'bg-[#FF6B4A] text-white shadow-xs'
-                : 'bg-white text-[#252525] hover:bg-neutral-100 border border-[#EAE5DF]'
+                : 'text-[#252525] hover:bg-neutral-100'
             }`}
           >
-            Chế độ danh sách
+            <List className="w-3.5 h-3.5" />
+            Danh sách
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('map')}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
               activeTab === 'map'
                 ? 'bg-[#FF6B4A] text-white shadow-xs'
-                : 'bg-white text-[#252525] hover:bg-neutral-100 border border-[#EAE5DF]'
+                : 'text-[#252525] hover:bg-neutral-100'
             }`}
           >
-            Chế độ bản đồ
+            <Map className="w-3.5 h-3.5" />
+            Bản đồ
           </button>
-        </div>
-
-        <div className="text-xs text-[#6B6B6B]">
-          Dữ liệu: <span className="font-semibold text-[#27865A]">Neon DB nội bộ</span>
         </div>
       </div>
 
@@ -151,7 +136,7 @@ export default function ExplorePage() {
           onRetry={loadRestaurants}
         />
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           <RestaurantMap
             center={preferences.location}
             radiusKm={preferences.radiusKm}
@@ -163,7 +148,7 @@ export default function ExplorePage() {
               onClick={() => setActiveTab('list')}
               className="text-[#FF6B4A] font-semibold hover:underline cursor-pointer"
             >
-              Xem danh sách quán
+              Xem danh sách
             </button>
           </div>
         </div>

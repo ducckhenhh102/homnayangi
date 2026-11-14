@@ -83,7 +83,7 @@ export default function LocationPicker({ location, onLocationChange, radiusKm, o
   return (
     <div className="space-y-4">
       <label className="block text-sm font-semibold text-[#252525]">
-        Bước 2: Vị trí & Bán kính tìm kiếm (Tối đa 10 km)
+        📍 Bạn đang ở đâu?
       </label>
 
       {/* Mode Selection */}
@@ -192,10 +192,7 @@ export default function LocationPicker({ location, onLocationChange, radiusKm, o
           <CheckCircle2 className="w-4 h-4 text-[#27865A] shrink-0" />
           <span className="font-medium">Vị trí tìm kiếm:</span>
           <span className="text-[#6B6B6B] truncate font-semibold">
-            {location.address || `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`}
-          </span>
-          <span className="text-xs font-mono text-[#FF6B4A] ml-auto">
-            ({location.lat.toFixed(3)}, {location.lng.toFixed(3)})
+            {location.address || 'Đã chọn vị trí trên bản đồ'}
           </span>
         </div>
       )}
