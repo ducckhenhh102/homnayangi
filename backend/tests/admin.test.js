@@ -114,3 +114,18 @@ test('Admin can create new restaurant and duplicate slug fails', async () => {
   });
   assert.equal(deleteRes.status, 200);
 });
+
+test('Admin can request signed Cloudinary upload params', async () => {
+  const res = await fetch(`${baseUrl}/api/v1/admin/uploads/signature`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${adminToken}` },
+  });
+  assert.equal(res.status, 200);
+
+  const body = await res.json();
+  assert.ok(body.data.signature);
+  assert.ok(body.data.timestamp);
+  assert.equal(body.data.cloudName, 'dahateimp');
+  assert.equal(body.data.apiKey, '172137129749838');
+  assert.ok(body.data.folder.includes('hom-nay-an-gi'));
+});

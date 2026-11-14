@@ -4,6 +4,7 @@ import Container from '../../components/common/Container';
 import PageTitle from '../../components/common/PageTitle';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
+import ImageUpload from '../../components/common/ImageUpload';
 import { useAuth } from '../../context/AuthContext';
 import { fetchApi } from '../../utils/api';
 import { ArrowLeft, PlusCircle, AlertCircle, MapPin } from 'lucide-react';
@@ -44,6 +45,7 @@ export default function AdminRestaurantFormPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [uploadedImage, setUploadedImage] = useState(null);
 
   const handleNameChange = (e) => {
     const val = e.target.value;
@@ -87,13 +89,30 @@ export default function AdminRestaurantFormPage() {
         companionScores: formData.companionScores,
       };
 
-      await fetchApi('/admin/restaurants', {
+      const created = await fetchApi('/admin/restaurants', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
+
+      // If image was uploaded to Cloudinary, attach it to the new restaurant
+      if (uploadedImage && created.data?.rawId) {
+        await fetchApi(`/admin/restaurants/${created.data.rawId}/images`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            cloudinaryPublicId: uploadedImage.cloudinaryPublicId,
+            secureUrl: uploadedImage.secureUrl,
+            width: uploadedImage.width,
+            height: uploadedImage.height,
+            altText: `Ảnh quán ${formData.name}`,
+          }),
+        });
+      }
 
       navigate('/admin/restaurants');
     } catch (err) {
@@ -178,6 +197,14 @@ export default function AdminRestaurantFormPage() {
                 required
               />
             </div>
+          </div>
+
+          {/* Image Upload */}
+          <div className="p-4 bg-neutral-50 rounded-2xl border border-[#EAE5DF]">
+            <ImageUpload
+              token={token}
+              onUploadSuccess={(res) => setUploadedImage(res)}
+            />
           </div>
 
           {/* Dining Types */}

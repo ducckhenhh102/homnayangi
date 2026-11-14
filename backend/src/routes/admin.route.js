@@ -4,6 +4,7 @@ import prisma from '../config/db.js';
 import { requireAuth, requireAdmin } from '../middlewares/auth.js';
 import { validate } from '../middlewares/validate.js';
 import { formatRestaurant } from '../services/restaurant.service.js';
+import { generateUploadSignature, destroyImage } from '../integrations/cloudinary.js';
 
 const router = Router();
 
@@ -239,6 +240,89 @@ router.post('/admin/foods', async (req, res, next) => {
     });
 
     res.status(201).json({ data: created });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 6. Cloudinary Upload Signature endpoint
+router.post('/admin/uploads/signature', (req, res, next) => {
+  try {
+    const subfolder = req.query.type === 'food' ? 'foods' : 'restaurants';
+    const signatureData = generateUploadSignature(subfolder);
+    res.status(200).json({ data: signatureData });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 7. Attach uploaded image metadata to restaurant
+const imageAttachSchema = z.object({
+  body: z.object({
+    cloudinaryPublicId: z.string().min(1, 'Public ID là bắt buộc'),
+    secureUrl: z.string().url('URL ảnh không hợp lệ'),
+    width: z.number().int().optional().nullable(),
+    height: z.number().int().optional().nullable(),
+    altText: z.string().optional().nullable(),
+    rightsSource: z.string().optional().nullable(),
+    sortOrder: z.number().int().default(0),
+  }),
+});
+
+router.post('/admin/restaurants/:id/images', validate(imageAttachSchema), async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const body = req.body;
+
+    const restaurant = await prisma.restaurant.findUnique({ where: { id } });
+    if (!restaurant) {
+      return res.status(404).json({
+        error: { code: 'NOT_FOUND', message: 'Không tìm thấy quán để gắn ảnh.' },
+      });
+    }
+
+    const createdImage = await prisma.restaurantImage.create({
+      data: {
+        restaurantId: id,
+        cloudinaryPublicId: body.cloudinaryPublicId,
+        secureUrl: body.secureUrl,
+        width: body.width ?? null,
+        height: body.height ?? null,
+        altText: body.altText ?? null,
+        rightsSource: body.rightsSource || 'Do admin tải lên',
+        sortOrder: body.sortOrder,
+        uploadedBy: req.user.id,
+      },
+    });
+
+    res.status(201).json({ data: createdImage });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 8. Delete restaurant image (from Cloudinary and DB)
+router.delete('/admin/restaurants/:id/images/:imageId', async (req, res, next) => {
+  try {
+    const { id, imageId } = req.params;
+
+    const img = await prisma.restaurantImage.findFirst({
+      where: { id: imageId, restaurantId: id },
+    });
+
+    if (!img) {
+      return res.status(404).json({
+        error: { code: 'NOT_FOUND', message: 'Không tìm thấy ảnh để xóa.' },
+      });
+    }
+
+    // Delete from Cloudinary
+    await destroyImage(img.cloudinaryPublicId);
+
+    // Delete from DB
+    await prisma.restaurantImage.delete({ where: { id: imageId } });
+
+    res.status(200).json({ data: { message: 'Đã xóa ảnh thành công.' } });
   } catch (err) {
     next(err);
   }
