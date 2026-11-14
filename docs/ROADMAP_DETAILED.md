@@ -199,13 +199,13 @@ graph TD
 
 **Mục tiêu:** người dùng quyết định nhanh, kết quả không vượt bộ lọc.
 
-- [ ] **11.1 — Xây UI vòng quay.** Tab `Quay món` / `Quay quán`, nút Quay, Quay lại, kết quả. **Đạt:** không đăng nhập vẫn dùng được.
-- [ ] **11.2 — Tập ứng viên.** Restaurant candidates lấy từ nearby đã lọc; food candidates chỉ gồm món có ít nhất một quán phù hợp trong bán kính. **Đạt:** không quay món không có nơi bán.
-- [ ] **11.3 — API spin.** `POST /api/v1/wheel/spin` với filters và mode; backend xác minh eligibility. **Đạt:** không tin mảng ID tùy ý do client gửi.
-- [ ] **11.4 — Đồng bộ màn hình và kết quả.** Animation chỉ là presentation; dừng đúng phần tử đã được chọn; tôn trọng reduced motion. **Đạt:** kết quả hiển thị trùng với ô thắng cuộc.
-- [ ] **11.5 — Reroll/avoid repeats.** Có thể gửi danh sách ID vừa thắng để tránh lặp nếu còn ứng viên; không bảo đảm tránh lặp nếu chỉ có một ứng viên. **Đạt:** edge case không deadlock.
-- [ ] **11.6 — Empty/changed candidates.** Không có quán -> hướng dẫn thay filter; kết quả hết hạn -> thông báo refresh và quay lại. **Đạt:** không quay vào item không tồn tại.
-- [ ] **11.7 — Commit.** `feat(wheel): add food and restaurant decision wheel`. **Đạt:** thử cả hai mode trên local.
+- [x] **11.1 — Xây UI vòng quay.** Tab `Quay món` / `Quay quán`, nút Quay, Quay lại, kết quả. **Đạt:** không đăng nhập vẫn dùng được.
+- [x] **11.2 — Tập ứng viên.** Restaurant candidates lấy từ nearby đã lọc; food candidates chỉ gồm món có ít nhất một quán phù hợp trong bán kính. **Đạt:** không quay món không có nơi bán.
+- [x] **11.3 — API spin.** `POST /api/v1/wheel/spin` với filters và mode; backend xác minh eligibility. **Đạt:** không tin mảng ID tùy ý do client gửi.
+- [x] **11.4 — Đồng bộ màn hình và kết quả.** Animation chỉ là presentation; dừng đúng phần tử đã được chọn; tôn trọng reduced motion. **Đạt:** kết quả hiển thị trùng với ô thắng cuộc.
+- [x] **11.5 — Reroll/avoid repeats.** Có thể gửi danh sách ID vừa thắng để tránh lặp nếu còn ứng viên; không bảo đảm tránh lặp nếu chỉ có một ứng viên. **Đạt:** edge case không deadlock.
+- [x] **11.6 — Empty/changed candidates.** Không có quán -> hướng dẫn thay filter; kết quả hết hạn -> thông báo refresh và quay lại. **Đạt:** không quay vào item không tồn tại.
+- [x] **11.7 — Commit.** `feat(wheel): add food and restaurant decision wheel`. **Đạt:** thử cả hai mode trên local.
 
 **DoD:** vòng quay nội bộ hoạt động trước khi bật Google.
 
@@ -353,6 +353,7 @@ Quy tắc: commit sau khi chạy test/kiểm tra của **một đơn vị công 
 | 2026-11-14 | Phase 8.1-8.9 | Admin JWT/bcrypt auth, protected restaurant CRUD, Form UI, 13/13 tests pass | `374e53b` | Quản trị thêm/sửa/ẩn quán trực tiếp từ UI |
 | 2026-11-14 | Phase 9.1-9.7 | Signed Cloudinary upload, image metadata DB attachment, ImageUpload UI | `00e80db` | Tải ảnh trực tiếp lên Cloudinary CDN có chữ ký |
 | 2026-11-14 | Phase 10.1-10.9 | Haversine formula, bounding box, nearby API, strict 10km filter, tests | `ad94641` | Lọc địa lý chính xác trong bán kính 10 km |
+| 2026-11-14 | Phase 11.1-11.7 | Food & restaurant wheel, synchronized rotation, backend spin API, tests pass | `cbeeae7` | Vòng quay món/quán ngẫu nhiên công bằng, xử lý empty state |
 
 ## H. Prompt mẫu để nhờ AI tiếp tục chính xác
 
