@@ -8,6 +8,7 @@ import discoveryRouter from './routes/discovery.route.js';
 import restaurantRouter from './routes/restaurant.route.js';
 import authRouter from './routes/auth.route.js';
 import adminRouter from './routes/admin.route.js';
+import wheelRouter from './routes/wheel.route.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
@@ -45,6 +46,7 @@ app.use('/api/v1', discoveryRouter);
 app.use('/api/v1', restaurantRouter);
 app.use('/api/v1', authRouter);
 app.use('/api/v1', adminRouter);
+app.use('/api/v1', wheelRouter);
 
 // Catch-all 404
 app.use(notFoundHandler);
