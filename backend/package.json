@@ -9,8 +9,7 @@
     "build": "prisma generate",
     "postinstall": "prisma generate",
     "test": "node --test tests/**/*.test.js",
-    "import:hanoi": "node scripts/importHanoiRestaurants.js",
-    "seed:images": "node scripts/seedHanoiImages.js"
+    "import:hanoi": "node scripts/importHanoiRestaurants.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
