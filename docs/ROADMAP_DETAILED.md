@@ -140,12 +140,12 @@ graph TD
 
 **Mục tiêu:** frontend đọc danh sách/chi tiết quán do admin tự quản lý.
 
-- [ ] **7.1 — Repository layer.** `restaurant.repository.js` chứa truy vấn Prisma; không đặt query SQL rải trong controller. **Đạt:** test repository mock được.
-- [ ] **7.2 — API danh sách.** `GET /api/v1/restaurants` với `page/limit`, lọc status active, dữ liệu null giữ nguyên. **Đạt:** `limit` có max chống trả hàng nghìn dòng.
-- [ ] **7.3 — API chi tiết.** `GET /api/v1/restaurants/:id` có món, ảnh, groups. **Đạt:** không tìm thấy trả 404.
-- [ ] **7.4 — Danh sách FE.** `RestaurantCard`, `RestaurantList`, skeleton/empty/error; TanStack Query nếu cần cache. **Đạt:** hiển thị từ API thật.
-- [ ] **7.5 — Trang chi tiết.** Ảnh, địa chỉ, nhóm ăn, khoảng giá nullable, chỉ đường dựa trên tọa độ nội bộ. **Đạt:** thiếu rating không hiện 0 sao giả.
-- [ ] **7.6 — Commit.** `feat(restaurants): add list and detail endpoints`. **Đạt:** từ homepage đi được trang chi tiết.
+- [x] **7.1 — Repository layer.** `restaurant.repository.js` chứa truy vấn Prisma; không đặt query SQL rải trong controller. **Đạt:** test repository mock được.
+- [x] **7.2 — API danh sách.** `GET /api/v1/restaurants` với `page/limit`, lọc status active, dữ liệu null giữ nguyên. **Đạt:** `limit` có max chống trả hàng nghìn dòng.
+- [x] **7.3 — API chi tiết.** `GET /api/v1/restaurants/:id` có món, ảnh, groups. **Đạt:** không tìm thấy trả 404.
+- [x] **7.4 — Danh sách FE.** `RestaurantCard`, `RestaurantList`, skeleton/empty/error; TanStack Query nếu cần cache. **Đạt:** hiển thị từ API thật.
+- [x] **7.5 — Trang chi tiết.** Ảnh, địa chỉ, nhóm ăn, khoảng giá nullable, chỉ đường dựa trên tọa độ nội bộ. **Đạt:** thiếu rating không hiện 0 sao giả.
+- [x] **7.6 — Commit.** `feat(restaurants): add list and detail endpoints`. **Đạt:** từ homepage đi được trang chi tiết.
 
 **DoD:** dữ liệu nội bộ chạy xuyên frontend -> backend -> Neon.
 
@@ -349,6 +349,7 @@ Quy tắc: commit sau khi chạy test/kiểm tra của **một đơn vị công 
 | 2026-11-14 | Phase 4.1-4.7 | 3-step Discovery Wizard, Context, Tests | `11abbf1` | Companion, DiningType, Location (GPS/Manual), tests 100% |
 | 2026-11-14 | Phase 5.1-5.7 | Express API, Helmet, CORS, Error handling, Health, tests | `86d4133` | `/health`, `/discovery/options` pass 3/3 test |
 | 2026-11-14 | Phase 6.1-6.9 | Kết nối Neon PostgreSQL Singapore, migration init, seed data, DB tests pass 100% | `a38b28c` | Phase 6 hoàn thành trọn vẹn |
+| 2026-11-14 | Phase 7.1-7.6 | Restaurant repository, service, list & detail API, FE Card/List/Detail | `2055d23` | Dữ liệu chạy xuyên suốt Neon -> API -> Frontend |
 
 ## H. Prompt mẫu để nhờ AI tiếp tục chính xác
 
