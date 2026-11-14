@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Container from '../components/common/Container';
-import PageTitle from '../components/common/PageTitle';
 import Button from '../components/common/Button';
-import EmptyState from '../components/common/EmptyState';
+import RestaurantList from '../components/restaurant/RestaurantList';
 import { useDiscovery } from '../context/DiscoveryContext';
+import { fetchApi } from '../utils/api';
 import { Heart, Users, User, Coffee, UtensilsCrossed, Beer, MapPin, Disc3, SlidersHorizontal, ArrowLeft } from 'lucide-react';
 
 const COMPANION_LABELS = {
@@ -23,11 +23,40 @@ export default function ExplorePage() {
   const navigate = useNavigate();
   const { preferences } = useDiscovery();
   const [activeTab, setActiveTab] = useState('list'); // 'list' | 'map'
+  const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const companion = COMPANION_LABELS[preferences.companion] || COMPANION_LABELS.couple;
   const dining = DINING_LABELS[preferences.diningType] || DINING_LABELS.meal;
   const CompanionIcon = companion.icon;
   const DiningIcon = dining.icon;
+
+  const loadRestaurants = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Query internal restaurants with current filter
+      const params = new URLSearchParams({
+        diningType: preferences.diningType,
+        companionType: preferences.companion,
+        limit: '20',
+      });
+
+      const response = await fetchApi(`/restaurants?${params.toString()}`);
+      setRestaurants(response.data || []);
+    } catch (err) {
+      console.error('Lỗi tải danh sách quán:', err);
+      setError(err.message || 'Không thể kết nối đến máy chủ.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadRestaurants();
+  }, [preferences.diningType, preferences.companion]);
 
   return (
     <Container className="space-y-6">
@@ -38,7 +67,7 @@ export default function ExplorePage() {
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#FF6B4A] hover:underline mb-2"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            Thay đổi lựa chọn
+            Thay đổi tiêu chí
           </Link>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#252525]">
             Địa điểm gợi ý cho bạn
@@ -58,7 +87,7 @@ export default function ExplorePage() {
       {/* Filter summary bar */}
       <div className="p-4 bg-white border border-[#EAE5DF] rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-xs">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-[#6B6B6B]">Đang lọc theo:</span>
+          <span className="text-xs font-medium text-[#6B6B6B]">Đang lọc:</span>
           
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FF6B4A]/10 text-[#FF6B4A]">
             <CompanionIcon className="w-3.5 h-3.5" />
@@ -113,24 +142,24 @@ export default function ExplorePage() {
         </div>
 
         <div className="text-xs text-[#6B6B6B]">
-          Đang chuẩn bị kết nối dữ liệu ở Phase 7 (Backend API)
+          Dữ liệu: <span className="font-semibold text-[#27865A]">Neon DB nội bộ</span>
         </div>
       </div>
 
       {/* Content Area */}
       {activeTab === 'list' ? (
-        <EmptyState
-          title="Chưa kết nối API quán ăn"
-          description="Bạn đã hoàn thành việc lựa chọn tiêu chí (Wizard 3 bước). Danh sách quán ăn thật từ Neon DB và Hybrid Places sẽ hiển thị tại đây sau khi thiết lập Backend Express & Database ở Phase 5-7."
-          actionLabel="Quay lại tùy chỉnh bộ lọc"
-          onAction={() => navigate('/')}
+        <RestaurantList
+          restaurants={restaurants}
+          loading={loading}
+          error={error}
+          onRetry={loadRestaurants}
         />
       ) : (
         <div className="h-96 bg-white border border-[#EAE5DF] rounded-2xl flex flex-col items-center justify-center p-6 text-center text-[#6B6B6B]">
           <MapPin className="w-10 h-10 text-[#FF6B4A] mb-3 opacity-60" />
           <h3 className="font-bold text-base text-[#252525] mb-1">Bản đồ địa điểm</h3>
           <p className="text-sm max-w-sm">
-            Bản đồ Hybrid (Leaflet cho quán nội bộ & Google Map cho Google Places) sẽ được tích hợp ở Phase 13.
+            Bản đồ Hybrid (Leaflet và Google Map attribution) sẽ được tích hợp ở Phase 13.
           </p>
         </div>
       )}

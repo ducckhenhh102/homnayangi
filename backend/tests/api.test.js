@@ -48,3 +48,31 @@ test('GET unknown route returns 404 with standard error JSON', async () => {
   assert.equal(body.error.code, 'NOT_FOUND');
   assert.ok(body.error.message.includes('không tồn tại'));
 });
+
+test('GET /api/v1/restaurants returns list of internal restaurants', async () => {
+  const res = await fetch(`${baseUrl}/api/v1/restaurants?limit=5`);
+  assert.equal(res.status, 200);
+
+  const body = await res.json();
+  assert.ok(Array.isArray(body.data));
+  assert.ok(body.data.length > 0);
+  assert.ok(body.meta.total > 0);
+
+  const first = body.data[0];
+  assert.ok(first.id.startsWith('internal:'));
+  assert.equal(first.source, 'internal');
+  assert.ok(first.location.lat);
+  assert.ok(first.location.lng);
+});
+
+test('GET /api/v1/restaurants/:id returns restaurant detail or 404', async () => {
+  const res = await fetch(`${baseUrl}/api/v1/restaurants/pho-thin-lo-duc-demo`);
+  assert.equal(res.status, 200);
+
+  const body = await res.json();
+  assert.equal(body.data.slug, 'pho-thin-lo-duc-demo');
+  assert.ok(body.data.foods.length > 0);
+
+  const notFound = await fetch(`${baseUrl}/api/v1/restaurants/unknown-place-9999`);
+  assert.equal(notFound.status, 404);
+});

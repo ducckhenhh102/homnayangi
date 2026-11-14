@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import healthRouter from './routes/health.route.js';
 import discoveryRouter from './routes/discovery.route.js';
+import restaurantRouter from './routes/restaurant.route.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
@@ -37,6 +38,7 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 // Base API v1 Routes
 app.use('/api/v1', healthRouter);
 app.use('/api/v1', discoveryRouter);
+app.use('/api/v1', restaurantRouter);
 
 // Catch-all 404
 app.use(notFoundHandler);
