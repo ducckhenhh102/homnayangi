@@ -183,15 +183,15 @@ graph TD
 
 **Mục tiêu:** tìm chính xác quán nội bộ quanh vị trí được chọn.
 
-- [ ] **10.1 — GPS permission.** Dùng `navigator.geolocation` khi người dùng chủ động bấm và trang chạy HTTPS; thông báo mục đích dùng vị trí. **Đạt:** GPS denied/timed out có đường nhập địa điểm.
-- [ ] **10.2 — Chọn vị trí thủ công.** Ban đầu cho kéo/chọn marker hoặc nhập tọa độ hợp lệ; sau đó mới tích hợp geocoder có giấy phép/chi phí phù hợp. **Đạt:** không buộc GPS để dùng được app.
-- [ ] **10.3 — Validate 10 km.** `lat [-90,90]`, `lng [-180,180]`, `radiusKm [1,10]`, `companion`, `diningType`, sort, pagination. **Đạt:** radius 20 trả 400, không bị tự nâng phạm vi.
-- [ ] **10.4 — Tính khoảng cách.** MVP dùng bounding box + Haversine chuẩn; sau đó đánh giá PostGIS/GiST nếu số quán lớn. **Đạt:** bên ngoài bán kính bị loại cả ở API, không chỉ FE.
-- [ ] **10.5 — API nearby nội bộ.** `GET /api/v1/restaurants/nearby`; đồng bộ `filters` với wizard. **Đạt:** tối đa 10 km địa lý từ điểm chọn.
-- [ ] **10.6 — Filter/rank.** `diningType` lọc nghiêm; `companion` là tín hiệu ưu tiên, không loại cứng. **Đạt:** cùng quán có thể thuộc 2 nhóm ăn.
-- [ ] **10.7 — Giao diện Explore.** Filter chips, sắp xếp, khoảng cách km, thẻ quán; ghi nguồn `Được quản lý bởi website`. **Đạt:** không hiển thị trạng thái mở cửa giả.
-- [ ] **10.8 — Test biên.** 0 km, đúng 10 km, >10 km, tọa độ ngoài range, 0 ứng viên, GPS denied. **Đạt:** test passes.
-- [ ] **10.9 — Commit.** `feat(location): find internal restaurants within 10km`. **Đạt:** website nội bộ dùng được không cần Google Places.
+- [x] **10.1 — GPS permission.** Dùng `navigator.geolocation` khi người dùng chủ động bấm và trang chạy HTTPS; thông báo mục đích dùng vị trí. **Đạt:** GPS denied/timed out có đường nhập địa điểm.
+- [x] **10.2 — Chọn vị trí thủ công.** Ban đầu cho kéo/chọn marker hoặc nhập tọa độ hợp lệ; sau đó mới tích hợp geocoder có giấy phép/chi phí phù hợp. **Đạt:** không buộc GPS để dùng được app.
+- [x] **10.3 — Validate 10 km.** `lat [-90,90]`, `lng [-180,180]`, `radiusKm [1,10]`, `companion`, `diningType`, sort, pagination. **Đạt:** radius 20 trả 400, không bị tự nâng phạm vi.
+- [x] **10.4 — Tính khoảng cách.** MVP dùng bounding box + Haversine chuẩn; sau đó đánh giá PostGIS/GiST nếu số quán lớn. **Đạt:** bên ngoài bán kính bị loại cả ở API, không chỉ FE.
+- [x] **10.5 — API nearby nội bộ.** `GET /api/v1/restaurants/nearby`; đồng bộ `filters` với wizard. **Đạt:** tối đa 10 km địa lý từ điểm chọn.
+- [x] **10.6 — Filter/rank.** `diningType` lọc nghiêm; `companion` là tín hiệu ưu tiên, không loại cứng. **Đạt:** cùng quán có thể thuộc 2 nhóm ăn.
+- [x] **10.7 — Giao diện Explore.** Filter chips, sắp xếp, khoảng cách km, thẻ quán; ghi nguồn `Được quản lý bởi website`. **Đạt:** không hiển thị trạng thái mở cửa giả.
+- [x] **10.8 — Test biên.** 0 km, đúng 10 km, >10 km, tọa độ ngoài range, 0 ứng viên, GPS denied. **Đạt:** test passes.
+- [x] **10.9 — Commit.** `feat(location): find internal restaurants within 10km`. **Đạt:** website nội bộ dùng được không cần Google Places.
 
 **DoD:** bán kính là đường chim bay, không tuyên bố khoảng cách lái xe.
 
@@ -352,6 +352,7 @@ Quy tắc: commit sau khi chạy test/kiểm tra của **một đơn vị công 
 | 2026-11-14 | Phase 7.1-7.6 | Restaurant repository, service, list & detail API, FE Card/List/Detail | `2055d23` | Dữ liệu chạy xuyên suốt Neon -> API -> Frontend |
 | 2026-11-14 | Phase 8.1-8.9 | Admin JWT/bcrypt auth, protected restaurant CRUD, Form UI, 13/13 tests pass | `374e53b` | Quản trị thêm/sửa/ẩn quán trực tiếp từ UI |
 | 2026-11-14 | Phase 9.1-9.7 | Signed Cloudinary upload, image metadata DB attachment, ImageUpload UI | `00e80db` | Tải ảnh trực tiếp lên Cloudinary CDN có chữ ký |
+| 2026-11-14 | Phase 10.1-10.9 | Haversine formula, bounding box, nearby API, strict 10km filter, tests | `ad94641` | Lọc địa lý chính xác trong bán kính 10 km |
 
 ## H. Prompt mẫu để nhờ AI tiếp tục chính xác
 
