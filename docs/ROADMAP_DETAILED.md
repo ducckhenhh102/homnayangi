@@ -153,15 +153,15 @@ graph TD
 
 **Mục tiêu:** bạn tự đăng quán mới mà không cần sửa code/deploy lại.
 
-- [ ] **8.1 — Chốt auth.** Thiết kế login admin server-side, hash mật khẩu mạnh (ưu tiên Argon2id hoặc cơ chế tương đương được hỗ trợ), cookie HttpOnly Secure; session tương thích serverless. **Đạt:** không dùng memory session trong Function, không lưu mật khẩu plaintext.
-- [ ] **8.2 — Tạo admin đầu tiên.** Seed/CLI quản trị an toàn, không hardcode tài khoản thật trong Git. **Đạt:** mật khẩu được hash, không in ra log.
-- [ ] **8.3 — `POST /auth/login`, `GET /auth/me`, `POST /auth/logout`.** Thêm rate limit; origin/CSRF protection nếu dùng cookies. **Đạt:** sai mật khẩu trả lỗi chung, không tiết lộ user có tồn tại.
-- [ ] **8.4 — Middleware admin.** Chặn API thay đổi dữ liệu với role, không chỉ ẩn button frontend. **Đạt:** request không session trả 401, user thiếu role 403.
-- [ ] **8.5 — Form quán.** Name, slug, địa chỉ, tọa độ, 3 nhóm ăn (nhiều chọn), mức phù hợp companion, status draft/active/hidden. **Đạt:** lỗi nhập hiển thị cạnh field.
-- [ ] **8.6 — CRUD API.** POST/PATCH/DELETE(soft) restaurants; trường hợp slug trùng hoặc tọa độ sai trả lỗi đúng. **Đạt:** thêm quán mới thấy trong `/explore` khi active.
-- [ ] **8.7 — CRUD món/menu.** Foods và restaurant_foods để quán bán nhiều món; giá VND từ menu thực tế. **Đạt:** có thể gắn một món vào nhiều quán.
-- [ ] **8.8 — Audit và test quyền.** Ghi thao tác admin cơ bản, test unauthorized/forbidden. **Đạt:** không bypass bằng API thủ công.
-- [ ] **8.9 — Commit.** `feat(admin): implement protected restaurant and menu CRUD`. **Đạt:** quản trị hoạt động hoàn toàn từ UI.
+- [x] **8.1 — Chốt auth.** Thiết kế login admin server-side, hash mật khẩu mạnh (ưu tiên Argon2id hoặc cơ chế tương đương được hỗ trợ), cookie HttpOnly Secure; session tương thích serverless. **Đạt:** không dùng memory session trong Function, không lưu mật khẩu plaintext.
+- [x] **8.2 — Tạo admin đầu tiên.** Seed/CLI quản trị an toàn, không hardcode tài khoản thật trong Git. **Đạt:** mật khẩu được hash, không in ra log.
+- [x] **8.3 — `POST /auth/login`, `GET /auth/me`, `POST /auth/logout`.** Thêm rate limit; origin/CSRF protection nếu dùng cookies. **Đạt:** sai mật khẩu trả lỗi chung, không tiết lộ user có tồn tại.
+- [x] **8.4 — Middleware admin.** Chặn API thay đổi dữ liệu với role, không chỉ ẩn button frontend. **Đạt:** request không session trả 401, user thiếu role 403.
+- [x] **8.5 — Form quán.** Name, slug, địa chỉ, tọa độ, 3 nhóm ăn (nhiều chọn), mức phù hợp companion, status draft/active/hidden. **Đạt:** lỗi nhập hiển thị cạnh field.
+- [x] **8.6 — CRUD API.** POST/PATCH/DELETE(soft) restaurants; trường hợp slug trùng hoặc tọa độ sai trả lỗi đúng. **Đạt:** thêm quán mới thấy trong `/explore` khi active.
+- [x] **8.7 — CRUD món/menu.** Foods và restaurant_foods để quán bán nhiều món; giá VND từ menu thực tế. **Đạt:** có thể gắn một món vào nhiều quán.
+- [x] **8.8 — Audit và test quyền.** Ghi thao tác admin cơ bản, test unauthorized/forbidden. **Đạt:** không bypass bằng API thủ công.
+- [x] **8.9 — Commit.** `feat(admin): implement protected restaurant and menu CRUD`. **Đạt:** quản trị hoạt động hoàn toàn từ UI.
 
 **DoD:** thêm/sửa/ẩn quán được mà không push/deploy code lại.
 
@@ -350,6 +350,7 @@ Quy tắc: commit sau khi chạy test/kiểm tra của **một đơn vị công 
 | 2026-11-14 | Phase 5.1-5.7 | Express API, Helmet, CORS, Error handling, Health, tests | `86d4133` | `/health`, `/discovery/options` pass 3/3 test |
 | 2026-11-14 | Phase 6.1-6.9 | Kết nối Neon PostgreSQL Singapore, migration init, seed data, DB tests pass 100% | `a38b28c` | Phase 6 hoàn thành trọn vẹn |
 | 2026-11-14 | Phase 7.1-7.6 | Restaurant repository, service, list & detail API, FE Card/List/Detail | `2055d23` | Dữ liệu chạy xuyên suốt Neon -> API -> Frontend |
+| 2026-11-14 | Phase 8.1-8.9 | Admin JWT/bcrypt auth, protected restaurant CRUD, Form UI, 13/13 tests pass | `374e53b` | Quản trị thêm/sửa/ẩn quán trực tiếp từ UI |
 
 ## H. Prompt mẫu để nhờ AI tiếp tục chính xác
 
