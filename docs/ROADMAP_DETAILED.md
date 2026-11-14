@@ -213,17 +213,17 @@ graph TD
 
 **Mục tiêu:** hợp nhất nguồn admin và nguồn ngoài mà vẫn giữ đúng giấy phép/chi phí.
 
-- [ ] **12.1 — Checklist trước tích hợp.** Đọc Terms/Policies mới nhất của provider; xác nhận mục đích website, map renderer, attribution, caching, billing. **Đạt:** quyết định bật Google có căn cứ.
-- [ ] **12.2 — Google Cloud setup.** Tạo project, bật Places API (New), billing, tạo server API key có restrictions, đặt quota/alerts. **Đạt:** key chỉ trong backend env và quota được kiểm soát.
-- [ ] **12.3 — Feature flag.** `PLACES_ENABLED=false` mặc định; bật true ở môi trường thử nghiệm khi sẵn sàng. **Đạt:** tắt provider vẫn hiển thị quán Neon.
-- [ ] **12.4 — Provider interface.** `searchNearby({lat,lng,radiusKm,diningType})`, `getPlaceDetails(id)` trong `backend/src/integrations/places/`; mock adapter cho tests. **Đạt:** service không import trực tiếp Google SDK ở business layer.
-- [ ] **12.5 — Google Nearby Search (New).** Backend `POST /v1/places:searchNearby` với FieldMask tối thiểu, `maxResultCount <=20`, radius m; timeout và lỗi 429. **Đạt:** response được normalize, không rò key.
-- [ ] **12.6 — Mapping type.** Ánh xạ loại quán sang `snack/meal/drinking` có `confidence`; `unknown` nếu không đủ dữ liệu. **Đạt:** không khẳng định phân loại 100% chính xác.
-- [ ] **12.7 — Tránh trùng.** `provider_place_id` đã xác minh -> liên kết quán internal; tên/địa chỉ gần -> gợi ý review, không tự gộp thiếu chứng cứ. **Đạt:** không nhập hai chi nhánh làm một.
-- [ ] **12.8 — Hợp nhất + fallback.** Internal + external hiện hành, normalize, dedup, filter/rank; lỗi provider -> `meta.partialResults=true`. **Đạt:** dữ liệu internal vẫn hoạt động khi Google lỗi.
-- [ ] **12.9 — Kiểm soát dữ liệu.** Neon chỉ lưu field từ admin/được phép và place ID ngoại lệ; không lấy Google photos/reviews, rating hay tọa độ để lưu vĩnh viễn trái điều khoản. **Đạt:** review schema/log/cache.
-- [ ] **12.10 — Mock integration tests.** Google success/empty/429/timeout/500, trùng provider ID, 10 km, attribution. **Đạt:** test không tốn API bill khi chạy CI.
-- [ ] **12.11 — Commit.** `feat(places): integrate compliant hybrid provider`. **Đạt:** feature flag true/false đều được test.
+- [x] **12.1 — Checklist trước tích hợp.** Đọc Terms/Policies mới nhất của provider; xác nhận mục đích website, map renderer, attribution, caching, billing. **Đạt:** quyết định bật Google có căn cứ.
+- [x] **12.2 — Google Cloud setup.** Tạo project, bật Places API (New), billing, tạo server API key có restrictions, đặt quota/alerts. **Đạt:** key chỉ trong backend env và quota được kiểm soát.
+- [x] **12.3 — Feature flag.** `PLACES_ENABLED=false` mặc định; bật true ở môi trường thử nghiệm khi sẵn sàng. **Đạt:** tắt provider vẫn hiển thị quán Neon.
+- [x] **12.4 — Provider interface.** `searchNearby({lat,lng,radiusKm,diningType})`, `getPlaceDetails(id)` trong `backend/src/integrations/places/`; mock adapter cho tests. **Đạt:** service không import trực tiếp Google SDK ở business layer.
+- [x] **12.5 — Google Nearby Search (New).** Backend `POST /v1/places:searchNearby` với FieldMask tối thiểu, `maxResultCount <=20`, radius m; timeout và lỗi 429. **Đạt:** response được normalize, không rò key.
+- [x] **12.6 — Mapping type.** Ánh xạ loại quán sang `snack/meal/drinking` có `confidence`; `unknown` nếu không đủ dữ liệu. **Đạt:** không khẳng định phân loại 100% chính xác.
+- [x] **12.7 — Tránh trùng.** `provider_place_id` đã xác minh -> liên kết quán internal; tên/địa chỉ gần -> gợi ý review, không tự gộp thiếu chứng cứ. **Đạt:** không nhập hai chi nhánh làm một.
+- [x] **12.8 — Hợp nhất + fallback.** Internal + external hiện hành, normalize, dedup, filter/rank; lỗi provider -> `meta.partialResults=true`. **Đạt:** dữ liệu internal vẫn hoạt động khi Google lỗi.
+- [x] **12.9 — Kiểm soát dữ liệu.** Neon chỉ lưu field từ admin/được phép và place ID ngoại lệ; không lấy Google photos/reviews, rating hay tọa độ để lưu vĩnh viễn trái điều khoản. **Đạt:** review schema/log/cache.
+- [x] **12.10 — Mock integration tests.** Google success/empty/429/timeout/500, trùng provider ID, 10 km, attribution. **Đạt:** test không tốn API bill khi chạy CI.
+- [x] **12.11 — Commit.** `feat(places): integrate compliant hybrid provider`. **Đạt:** feature flag true/false đều được test.
 
 **DoD:** Hybrid hoạt động và có giới hạn chi phí; nếu không bật Google thì MVP vẫn đạt chức năng nội bộ.
 
@@ -231,12 +231,12 @@ graph TD
 
 **Mục tiêu:** hiển thị dữ liệu đúng bản quyền nhà cung cấp.
 
-- [ ] **13.1 — Quyết định map renderer theo nguồn.** Danh sách nội bộ có thể dùng Leaflet/nguồn map phù hợp; **có Google Places points trên bản đồ thì phải dùng Google Map** và attribution đúng. **Đạt:** không trộn Google Places markers vào Leaflet.
-- [ ] **13.2 — Lập map view.** Marker vị trí trung tâm, bán kính 10 km, các marker theo nguồn và bộ lọc; click marker mở card. **Đạt:** chuyển map/list không đổi tập ứng viên.
-- [ ] **13.3 — Attribution/links.** Với Google, hiển thị logo/attribution, photo/review credits theo chính sách; có privacy/terms công khai. **Đạt:** kiểm tra bằng checklist provider.
-- [ ] **13.4 — Mobile interaction.** Bottom sheet/tab list-map, nút về danh sách, map keyboard alternate. **Đạt:** điều hướng bằng danh sách không cần dùng map.
-- [ ] **13.5 — Chọn quán/chỉ đường.** Link mở Google Maps hoặc dịch vụ chỉ đường bằng URL hợp lệ; không tuyên bố km đi đường từ Haversine. **Đạt:** link đúng tọa độ và không có redirect open relay.
-- [ ] **13.6 — Commit.** `feat(map): add compliant map and list views`. **Đạt:** map không vi phạm chính sách Google Places khi bật Hybrid.
+- [x] **13.1 — Quyết định map renderer theo nguồn.** Danh sách nội bộ có thể dùng Leaflet/nguồn map phù hợp; **có Google Places points trên bản đồ thì phải dùng Google Map** và attribution đúng. **Đạt:** không trộn Google Places markers vào Leaflet.
+- [x] **13.2 — Lập map view.** Marker vị trí trung tâm, bán kính 10 km, các marker theo nguồn và bộ lọc; click marker mở card. **Đạt:** chuyển map/list không đổi tập ứng viên.
+- [x] **13.3 — Attribution/links.** Với Google, hiển thị logo/attribution, photo/review credits theo chính sách; có privacy/terms công khai. **Đạt:** kiểm tra bằng checklist provider.
+- [x] **13.4 — Mobile interaction.** Bottom sheet/tab list-map, nút về danh sách, map keyboard alternate. **Đạt:** điều hướng bằng danh sách không cần dùng map.
+- [x] **13.5 — Chọn quán/chỉ đường.** Link mở Google Maps hoặc dịch vụ chỉ đường bằng URL hợp lệ; không tuyên bố km đi đường từ Haversine. **Đạt:** link đúng tọa độ và không có redirect open relay.
+- [x] **13.6 — Commit.** `feat(map): add compliant map and list views`. **Đạt:** map không vi phạm chính sách Google Places khi bật Hybrid.
 
 **DoD:** Google Places content không được vẽ lên non-Google map.
 
