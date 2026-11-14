@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Container from '../components/common/Container';
 import Button from '../components/common/Button';
 import RestaurantList from '../components/restaurant/RestaurantList';
+import RestaurantMap from '../components/map/RestaurantMap';
 import { useDiscovery } from '../context/DiscoveryContext';
 import { fetchApi } from '../utils/api';
 import { Heart, Users, User, Coffee, UtensilsCrossed, Beer, MapPin, Disc3, SlidersHorizontal, ArrowLeft } from 'lucide-react';
@@ -165,12 +166,21 @@ export default function ExplorePage() {
           onRetry={loadRestaurants}
         />
       ) : (
-        <div className="h-96 bg-white border border-[#EAE5DF] rounded-2xl flex flex-col items-center justify-center p-6 text-center text-[#6B6B6B]">
-          <MapPin className="w-10 h-10 text-[#FF6B4A] mb-3 opacity-60" />
-          <h3 className="font-bold text-base text-[#252525] mb-1">Bản đồ địa điểm</h3>
-          <p className="text-sm max-w-sm">
-            Bản đồ Hybrid (Leaflet và Google Map attribution) sẽ được tích hợp ở Phase 13.
-          </p>
+        <div className="space-y-4">
+          <RestaurantMap
+            center={preferences.location}
+            radiusKm={preferences.radiusKm}
+            restaurants={restaurants}
+          />
+          <div className="p-3 bg-white border border-[#EAE5DF] rounded-xl text-xs text-[#6B6B6B] flex items-center justify-between">
+            <span>Bấm vào biểu tượng 🍜 trên bản đồ để xem thông tin quán và nút chỉ đường Google Maps.</span>
+            <button
+              onClick={() => setActiveTab('list')}
+              className="text-[#FF6B4A] font-semibold hover:underline cursor-pointer"
+            >
+              Xem danh sách quán
+            </button>
+          </div>
         </div>
       )}
     </Container>
