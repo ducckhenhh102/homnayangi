@@ -1,14 +1,15 @@
 export function validate(schema) {
   return (req, res, next) => {
     try {
-      if (schema.query) {
-        req.query = schema.query.parse(req.query);
+      const s = schema.shape || schema;
+      if (s.query) {
+        req.query = s.query.parse(req.query);
       }
-      if (schema.body) {
-        req.body = schema.body.parse(req.body);
+      if (s.body) {
+        req.body = s.body.parse(req.body);
       }
-      if (schema.params) {
-        req.params = schema.params.parse(req.params);
+      if (s.params) {
+        req.params = s.params.parse(req.params);
       }
       next();
     } catch (err) {

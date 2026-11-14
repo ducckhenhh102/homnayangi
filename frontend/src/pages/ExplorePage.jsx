@@ -37,17 +37,21 @@ export default function ExplorePage() {
       setLoading(true);
       setError(null);
 
-      // Query internal restaurants with current filter
+      // Query nearby restaurants with current coordinates & radius
       const params = new URLSearchParams({
+        lat: String(preferences.location?.lat || 21.0285),
+        lng: String(preferences.location?.lng || 105.8542),
+        radiusKm: String(preferences.radiusKm || 10),
         diningType: preferences.diningType,
-        companionType: preferences.companion,
+        companion: preferences.companion,
         limit: '20',
+        sort: 'distance',
       });
 
-      const response = await fetchApi(`/restaurants?${params.toString()}`);
+      const response = await fetchApi(`/restaurants/nearby?${params.toString()}`);
       setRestaurants(response.data || []);
     } catch (err) {
-      console.error('Lỗi tải danh sách quán:', err);
+      console.error('Lỗi tải danh sách quán gần đây:', err);
       setError(err.message || 'Không thể kết nối đến máy chủ.');
     } finally {
       setLoading(false);
@@ -56,7 +60,13 @@ export default function ExplorePage() {
 
   useEffect(() => {
     loadRestaurants();
-  }, [preferences.diningType, preferences.companion]);
+  }, [
+    preferences.location?.lat,
+    preferences.location?.lng,
+    preferences.radiusKm,
+    preferences.diningType,
+    preferences.companion,
+  ]);
 
   return (
     <Container className="space-y-6">

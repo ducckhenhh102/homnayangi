@@ -76,3 +76,27 @@ test('GET /api/v1/restaurants/:id returns restaurant detail or 404', async () =>
   const notFound = await fetch(`${baseUrl}/api/v1/restaurants/unknown-place-9999`);
   assert.equal(notFound.status, 404);
 });
+
+test('GET /api/v1/restaurants/nearby validates parameters strictly', async () => {
+  // Missing lat/lng
+  const missingCoords = await fetch(`${baseUrl}/api/v1/restaurants/nearby`);
+  assert.equal(missingCoords.status, 400);
+
+  // Radius > 10 km must be rejected with 400 (AT-04 rule)
+  const excessiveRadius = await fetch(`${baseUrl}/api/v1/restaurants/nearby?lat=21.0285&lng=105.8542&radiusKm=20`);
+  assert.equal(excessiveRadius.status, 400);
+  const errBody = await excessiveRadius.json();
+  assert.equal(errBody.error.code, 'VALIDATION_ERROR');
+
+  // Valid query in Hanoi within 10 km
+  const validRes = await fetch(`${baseUrl}/api/v1/restaurants/nearby?lat=21.0285&lng=105.8542&radiusKm=5&companion=couple`);
+  assert.equal(validRes.status, 200);
+  const body = await validRes.json();
+  assert.ok(Array.isArray(body.data));
+  assert.equal(body.meta.radiusKm, 5);
+
+  // Check all returned items are strictly <= 5 km
+  for (const item of body.data) {
+    assert.ok(item.distanceKm <= 5, `Restaurant ${item.name} is ${item.distanceKm} km, expected <= 5 km`);
+  }
+});

@@ -21,6 +21,7 @@ export function formatRestaurant(item) {
     priceMax: item.priceMax,
     rating: null, // Strictly honest: null when not collected/verified
     isOpen: null, // Strictly honest: null when live status is unavailable
+    distanceKm: item.distanceKm !== undefined ? item.distanceKm : null,
     imageUrl: item.images?.[0]?.secureUrl || null,
     images: item.images?.map((img) => ({
       id: img.id,
@@ -64,6 +65,22 @@ export const restaurantService = {
     }
     return {
       data: formatRestaurant(item),
+    };
+  },
+
+  async getNearbyRestaurants(params) {
+    const { items, total, page, limit, radiusKm } = await restaurantRepository.findNearby(params);
+    return {
+      data: items.map(formatRestaurant),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        radiusKm,
+        partialResults: false,
+        sources: ['internal'],
+      },
     };
   },
 };
