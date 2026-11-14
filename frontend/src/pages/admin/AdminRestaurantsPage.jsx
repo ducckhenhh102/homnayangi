@@ -61,6 +61,22 @@ export default function AdminRestaurantsPage() {
     }
   };
 
+  const handlePermanentDelete = async (id, name) => {
+    if (!window.confirm(`CẢNH BÁO: Bạn có chắc chắn muốn XÓA VĨNH VIỄN quán "${name}" khỏi cơ sở dữ liệu? Toàn bộ món ăn và liên kết của quán sẽ bị xóa hoàn toàn.`)) return;
+    try {
+      setActionLoading(id);
+      await fetchApi(`/admin/restaurants/${id}/permanent`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      await loadRestaurants();
+    } catch (err) {
+      alert(err.message || 'Lỗi khi xóa quán vĩnh viễn');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleUploadImageSuccess = async (uploadResult) => {
     if (!photoModalRestaurant || !token) return;
     try {
@@ -182,6 +198,22 @@ export default function AdminRestaurantsPage() {
         </div>
       </div>
 
+      {/* Tabs chuyển đổi giữa Quán chính thức và Quán người dùng đề xuất */}
+      <div className="flex items-center gap-2 border-b border-[#EAE5DF] pb-3">
+        <button
+          type="button"
+          className="px-4 py-2 rounded-xl text-sm font-semibold bg-[#FF6B4A] text-white shadow-xs cursor-default"
+        >
+          Quán chính thức ({restaurants.length})
+        </button>
+        <Link
+          to="/admin/submissions"
+          className="px-4 py-2 rounded-xl text-sm font-semibold bg-white text-[#252525] hover:bg-neutral-100 border border-[#EAE5DF] transition-colors"
+        >
+          Quán người dùng đề xuất
+        </Link>
+      </div>
+
       {/* Content */}
       {loading ? (
         <div className="space-y-3">
@@ -254,12 +286,24 @@ export default function AdminRestaurantsPage() {
                           type="button"
                           disabled={actionLoading === r.id}
                           onClick={() => handleHideRestaurant(r.id)}
-                          className="inline-flex items-center text-xs text-[#C73535] hover:underline cursor-pointer disabled:opacity-50"
+                          className="inline-flex items-center text-xs text-amber-600 hover:underline cursor-pointer disabled:opacity-50"
+                          title="Ẩn quán khỏi kết quả tìm kiếm"
                         >
                           <EyeOff className="w-3.5 h-3.5 mr-1" />
-                          Ẩn quán
+                          Ẩn
                         </button>
                       )}
+
+                      <button
+                        type="button"
+                        disabled={actionLoading === r.id}
+                        onClick={() => handlePermanentDelete(r.id, r.name)}
+                        className="inline-flex items-center text-xs text-[#C73535] hover:underline cursor-pointer disabled:opacity-50"
+                        title="Xóa vĩnh viễn khỏi database"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 mr-1" />
+                        Xóa
+                      </button>
                     </td>
                   </tr>
                 ))}

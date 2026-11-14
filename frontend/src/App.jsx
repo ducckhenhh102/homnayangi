@@ -8,6 +8,8 @@ import RestaurantDetailPage from './pages/RestaurantDetailPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminRestaurantsPage from './pages/admin/AdminRestaurantsPage';
 import AdminRestaurantFormPage from './pages/admin/AdminRestaurantFormPage';
+import AdminSubmissionsPage from './pages/admin/AdminSubmissionsPage';
+import SubmitRestaurantPage from './pages/SubmitRestaurantPage';
 import NotFoundPage from './pages/NotFoundPage';
 import { DiscoveryProvider } from './context/DiscoveryContext';
 import { AuthProvider } from './context/AuthContext';
@@ -26,6 +28,8 @@ export default function App() {
               <Route path="/admin/login" element={<AdminLoginPage />} />
               <Route path="/admin/restaurants" element={<AdminRestaurantsPage />} />
               <Route path="/admin/restaurants/new" element={<AdminRestaurantFormPage />} />
+              <Route path="/admin/submissions" element={<AdminSubmissionsPage />} />
+              <Route path="/submit-restaurant" element={<SubmitRestaurantPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Layout>

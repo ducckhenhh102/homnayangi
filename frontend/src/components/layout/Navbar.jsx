@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Utensils, Compass, Disc3, Shield, Menu, X } from 'lucide-react';
+import { Utensils, Compass, Disc3, Shield, Menu, X, PlusCircle } from 'lucide-react';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -9,6 +9,7 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Khám phá', path: '/explore', icon: Compass },
     { name: 'Vòng quay', path: '/wheel', icon: Disc3 },
+    { name: 'Chia sẻ quán', path: '/submit-restaurant', icon: PlusCircle },
     { name: 'Quản trị', path: '/admin/login', icon: Shield },
   ];
 

@@ -181,3 +181,32 @@ model User {
 
   @@map("users")
 }
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model RestaurantSubmission {
+  id               String           @id @default(uuid())
+  name             String           @db.VarChar(200)
+  address          String           @db.Text
+  latitude         Float
+  longitude        Float
+  description      String?          @db.Text
+  diningTypes      String[]         @default(["meal"]) @map("dining_types")
+  priceMin         Int?             @map("price_min")
+  priceMax         Int?             @map("price_max")
+  submitterName    String?          @map("submitter_name") @db.VarChar(100)
+  submitterContact String?          @map("submitter_contact") @db.VarChar(100)
+  note             String?          @db.Text
+  status           SubmissionStatus @default(PENDING)
+  rejectionReason  String?          @map("rejection_reason") @db.Text
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("restaurant_submissions")
+}

@@ -214,6 +214,33 @@ router.delete('/admin/restaurants/:id', async (req, res, next) => {
   }
 });
 
+// 4b. Permanent delete restaurant (remove completely from DB)
+router.delete('/admin/restaurants/:id/permanent', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const existing = await prisma.restaurant.findUnique({ where: { id } });
+    if (!existing) {
+      return res.status(404).json({
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Không tìm thấy quán để xóa vĩnh viễn.',
+        },
+      });
+    }
+
+    await prisma.restaurant.delete({ where: { id } });
+
+    res.status(200).json({
+      data: {
+        message: 'Đã xóa vĩnh viễn quán ăn khỏi cơ sở dữ liệu.',
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // 5. Foods list and create for admin
 router.get('/admin/foods', async (req, res, next) => {
   try {
@@ -323,6 +350,173 @@ router.delete('/admin/restaurants/:id/images/:imageId', async (req, res, next) =
     await prisma.restaurantImage.delete({ where: { id: imageId } });
 
     res.status(200).json({ data: { message: 'Đã xóa ảnh thành công.' } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+function slugify(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[đĐ]/g, 'd')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
+// 9. List user submissions (separated table)
+router.get('/admin/submissions', async (req, res, next) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page || '1', 10));
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit || '20', 10)));
+    const skip = (page - 1) * limit;
+    const status = req.query.status;
+
+    const where = {};
+    if (status && status !== 'ALL') {
+      where.status = status;
+    }
+
+    const [items, total] = await Promise.all([
+      prisma.restaurantSubmission.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.restaurantSubmission.count({ where }),
+    ]);
+
+    res.status(200).json({
+      data: items,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 10. Approve submission -> creates official restaurant in restaurants table
+router.post('/admin/submissions/:id/approve', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const submission = await prisma.restaurantSubmission.findUnique({ where: { id } });
+
+    if (!submission) {
+      return res.status(404).json({
+        error: { code: 'NOT_FOUND', message: 'Không tìm thấy đề xuất quán.' },
+      });
+    }
+
+    if (submission.status === 'APPROVED') {
+      return res.status(400).json({
+        error: { code: 'ALREADY_APPROVED', message: 'Đề xuất này đã được duyệt trước đó.' },
+      });
+    }
+
+    // Generate unique slug
+    let baseSlug = slugify(submission.name);
+    let finalSlug = baseSlug;
+    let counter = 1;
+    while (await prisma.restaurant.findUnique({ where: { slug: finalSlug } })) {
+      finalSlug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+
+    // Create restaurant in restaurants table
+    const createdRestaurant = await prisma.restaurant.create({
+      data: {
+        name: submission.name,
+        slug: finalSlug,
+        address: submission.address,
+        latitude: submission.latitude,
+        longitude: submission.longitude,
+        description: submission.description,
+        priceMin: submission.priceMin,
+        priceMax: submission.priceMax,
+        status: 'PUBLISHED',
+        createdById: req.user?.id ? (await prisma.user.findUnique({ where: { id: req.user.id } })) ? req.user.id : null : null,
+        diningTypes: {
+          create: (submission.diningTypes || ['meal']).map((dt) => ({
+            diningTypeId: dt,
+          })),
+        },
+        companionTypes: {
+          create: [
+            { companionTypeId: 'couple', suitabilityScore: 85 },
+            { companionTypeId: 'friends', suitabilityScore: 85 },
+            { companionTypeId: 'solo', suitabilityScore: 80 },
+          ],
+        },
+      },
+    });
+
+    // Update submission status to APPROVED
+    await prisma.restaurantSubmission.update({
+      where: { id },
+      data: { status: 'APPROVED' },
+    });
+
+    res.status(200).json({
+      data: {
+        message: 'Đã duyệt quán thành công! Quán đã xuất hiện chính thức trên hệ thống.',
+        restaurant: createdRestaurant,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 11. Reject submission
+router.post('/admin/submissions/:id/reject', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body || {};
+
+    const submission = await prisma.restaurantSubmission.findUnique({ where: { id } });
+    if (!submission) {
+      return res.status(404).json({
+        error: { code: 'NOT_FOUND', message: 'Không tìm thấy đề xuất quán.' },
+      });
+    }
+
+    const updated = await prisma.restaurantSubmission.update({
+      where: { id },
+      data: {
+        status: 'REJECTED',
+        rejectionReason: reason || 'Không phù hợp tiêu chí',
+      },
+    });
+
+    res.status(200).json({
+      data: {
+        message: 'Đã từ chối đề xuất quán.',
+        submission: updated,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 12. Delete submission
+router.delete('/admin/submissions/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await prisma.restaurantSubmission.delete({ where: { id } });
+
+    res.status(200).json({
+      data: { message: 'Đã xóa bản ghi đề xuất.' },
+    });
   } catch (err) {
     next(err);
   }
