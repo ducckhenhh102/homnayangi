@@ -5,6 +5,7 @@ import PageTitle from '../../components/common/PageTitle';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import ImageUpload from '../../components/common/ImageUpload';
+import MapLocationPicker from '../../components/common/MapLocationPicker';
 import { useAuth } from '../../context/AuthContext';
 import { fetchApi } from '../../utils/api';
 import { ArrowLeft, PlusCircle, AlertCircle, MapPin } from 'lucide-react';
@@ -173,29 +174,28 @@ export default function AdminRestaurantFormPage() {
             required
           />
 
-          {/* Coordinates */}
-          <div className="p-4 bg-neutral-50 rounded-2xl border border-[#EAE5DF] space-y-3">
-            <div className="flex items-center gap-1.5 text-sm font-semibold text-[#252525]">
+          {/* Coordinates Map Picker */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[#6B6B6B] uppercase">
               <MapPin className="w-4 h-4 text-[#FF6B4A]" />
-              <span>Tọa độ WGS84 (Dùng để tính bán kính 10 km)</span>
+              <span>Vị trí & Tọa độ quán (Bấm trực tiếp trên bản đồ) *</span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                label="Vĩ độ (Latitude: -90 đến 90)"
-                type="number"
-                step="any"
-                value={formData.latitude}
-                onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                required
-              />
-              <Input
-                label="Kinh độ (Longitude: -180 đến 180)"
-                type="number"
-                step="any"
-                value={formData.longitude}
-                onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                required
-              />
+            <MapLocationPicker
+              lat={formData.latitude ? parseFloat(formData.latitude) : 21.0285}
+              lng={formData.longitude ? parseFloat(formData.longitude) : 105.8542}
+              defaultAddress={formData.address}
+              onChange={({ lat, lng, address }) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  latitude: String(lat),
+                  longitude: String(lng),
+                  address: prev.address ? prev.address : address,
+                }));
+              }}
+              height="260px"
+            />
+            <div className="flex items-center gap-2 text-xs font-mono text-[#6B6B6B] bg-neutral-50 p-2.5 rounded-xl border border-[#EAE5DF]">
+              <span>Tọa độ đã chọn: <strong>{formData.latitude}</strong> (Vĩ độ), <strong>{formData.longitude}</strong> (Kinh độ)</span>
             </div>
           </div>
 

@@ -4,6 +4,7 @@ import Container from '../components/common/Container';
 import PageTitle from '../components/common/PageTitle';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
+import MapLocationPicker from '../components/common/MapLocationPicker';
 import { fetchApi } from '../utils/api';
 import { ArrowLeft, CheckCircle2, MapPin, Share2, AlertCircle, Coffee, UtensilsCrossed, Beer, Sparkles } from 'lucide-react';
 
@@ -211,39 +212,29 @@ export default function SubmitRestaurantPage() {
             required
           />
 
-          {/* Tọa độ GPS */}
+          {/* Chọn vị trí & Tọa độ trên bản đồ */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="block text-xs font-bold text-[#252525] uppercase tracking-wider">
-                Tọa độ vị trí quán (Lat, Lng) *
-              </label>
-              <button
-                type="button"
-                disabled={loadingGps}
-                onClick={handleGetCurrentLocation}
-                className="text-xs font-semibold text-[#FF6B4A] hover:underline inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
-              >
-                <MapPin className="w-3.5 h-3.5" />
-                {loadingGps ? 'Đang lấy tọa độ...' : 'Lấy vị trí hiện tại của bạn'}
-              </button>
+            <label className="block text-xs font-bold text-[#252525] uppercase tracking-wider">
+              Vị trí & Tọa độ quán (Bấm trực tiếp vào bản đồ) *
+            </label>
+            <MapLocationPicker
+              lat={formData.latitude ? parseFloat(formData.latitude) : 21.0285}
+              lng={formData.longitude ? parseFloat(formData.longitude) : 105.8544}
+              defaultAddress={formData.address}
+              onChange={({ lat, lng, address }) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  latitude: String(lat),
+                  longitude: String(lng),
+                  address: prev.address ? prev.address : address,
+                }));
+              }}
+              height="280px"
+            />
+            <div className="flex items-center gap-2 text-xs font-mono text-[#6B6B6B] bg-neutral-50 p-2.5 rounded-xl border border-[#EAE5DF]">
+              <MapPin className="w-4 h-4 text-[#FF6B4A] shrink-0" />
+              <span>Tọa độ đã chọn: <strong>{formData.latitude || '21.0285'}</strong>, <strong>{formData.longitude || '105.8544'}</strong></span>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                placeholder="Vĩ độ (Lat: ví dụ 21.0336)"
-                value={formData.latitude}
-                onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                required
-              />
-              <Input
-                placeholder="Kinh độ (Lng: ví dụ 105.8475)"
-                value={formData.longitude}
-                onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                required
-              />
-            </div>
-            <p className="text-[11px] text-[#6B6B6B]">
-              Nếu đang ở tại quán, bạn chỉ cần bấm "Lấy vị trí hiện tại của bạn". Hoặc bạn có thể tra nhanh trên Google Maps.
-            </p>
           </div>
 
           {/* Loại hình ăn uống */}
