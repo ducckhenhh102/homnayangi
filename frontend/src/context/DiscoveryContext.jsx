@@ -4,7 +4,7 @@ const STORAGE_KEY = 'hnag_discovery_preferences';
 
 const DEFAULT_PREFERENCES = {
   diningType: 'meal',  // 'snack' | 'meal' | 'drinking'
-  radiusKm: 5,        // 1..10
+  radiusKm: 10,       // Fixed area search window
   location: {
     type: 'manual',    // 'gps' | 'manual'
     lat: 21.028511,    // Hà Nội center default fallback

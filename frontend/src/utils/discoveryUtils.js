@@ -2,7 +2,7 @@ export const VALID_DINING_TYPES = ['snack', 'meal', 'drinking'];
 
 export function clampRadius(radius) {
   const num = Number(radius);
-  if (isNaN(num)) return 5;
+  if (isNaN(num)) return 10;
   if (num < 1) return 1;
   if (num > 10) return 10;
   return Math.round(num);

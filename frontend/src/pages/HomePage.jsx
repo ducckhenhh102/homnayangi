@@ -14,11 +14,11 @@ export default function HomePage() {
           Hôm nay <span className="text-[#FF6B4A]">ăn gì?</span>
         </h1>
         <p className="mt-3 text-sm sm:text-base text-[#6B6B6B]">
-          Chọn kiểu ăn uống và vị trí — để chúng tôi gợi ý quán ngon quanh bạn trong vòng 10 km.
+          Chọn kiểu ăn uống và khu vực — để chúng tôi gợi ý những quán ngon phù hợp nhất cho bạn.
         </p>
       </div>
 
-      {/* 3-Step Discovery Wizard */}
+      {/* Discovery Wizard */}
       <DiscoveryWizard />
     </Container>
   );

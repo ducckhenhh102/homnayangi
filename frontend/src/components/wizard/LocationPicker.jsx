@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Navigation, AlertCircle, CheckCircle2, Compass } from 'lucide-react';
+import { Navigation, AlertCircle, CheckCircle2, Compass } from 'lucide-react';
 import MapLocationPicker from '../common/MapLocationPicker';
 
 const PRESET_LOCATIONS = [
@@ -14,7 +14,7 @@ const PRESET_LOCATIONS = [
   { name: 'Hà Nội - Hà Đông', lat: 20.9721, lng: 105.7766 },
 ];
 
-export default function LocationPicker({ location, onLocationChange, radiusKm, onRadiusChange }) {
+export default function LocationPicker({ location, onLocationChange }) {
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsError, setGpsError] = useState(null);
   const [showMapPicker, setShowMapPicker] = useState(false);
@@ -83,11 +83,35 @@ export default function LocationPicker({ location, onLocationChange, radiusKm, o
   return (
     <div className="space-y-4">
       <label className="block text-sm font-semibold text-[#252525]">
-        📍 Bạn đang ở đâu?
+        📍 Chọn khu vực của bạn
       </label>
 
-      {/* Mode Selection */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {/* Quick district buttons for Hanoi */}
+      <div className="space-y-2">
+        <span className="text-xs font-medium text-[#6B6B6B]">Chọn nhanh khu vực Hà Nội:</span>
+        <div className="flex flex-wrap gap-2">
+          {PRESET_LOCATIONS.map((preset) => {
+            const isSelected = location?.lat === preset.lat && location?.lng === preset.lng;
+            return (
+              <button
+                key={preset.name}
+                type="button"
+                onClick={() => handleSelectPreset(preset)}
+                className={`text-xs px-3 py-2 rounded-xl border transition-all cursor-pointer font-medium ${
+                  isSelected
+                    ? 'border-[#FF6B4A] bg-[#FF6B4A] text-white shadow-xs'
+                    : 'border-[#EAE5DF] bg-white text-[#252525] hover:border-neutral-300 hover:bg-neutral-50'
+                }`}
+              >
+                {preset.name.replace('Hà Nội - ', '')}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Mode Selection: GPS or Custom Map */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
         <button
           type="button"
           onClick={handleGetGps}
@@ -102,7 +126,7 @@ export default function LocationPicker({ location, onLocationChange, radiusKm, o
             <Navigation className={`w-4 h-4 ${gpsLoading ? 'animate-spin' : ''}`} />
           </div>
           <div>
-            <div className="font-semibold text-sm text-[#252525]">Dùng GPS hiện tại</div>
+            <div className="font-semibold text-sm text-[#252525]">Dùng GPS vị trí hiện tại</div>
             <div className="text-xs text-[#6B6B6B]">
               {location?.type === 'gps' ? 'Đã định vị thành công' : 'Bấm để tự động định vị'}
             </div>
@@ -113,7 +137,7 @@ export default function LocationPicker({ location, onLocationChange, radiusKm, o
           type="button"
           onClick={() => setShowMapPicker(!showMapPicker)}
           className={`flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FF6B4A] ${
-            showMapPicker || location?.type === 'manual'
+            showMapPicker
               ? 'border-[#FF6B4A] bg-[#FF6B4A]/5 ring-1 ring-[#FF6B4A]'
               : 'border-[#EAE5DF] bg-white hover:border-neutral-300'
           }`}
@@ -122,9 +146,9 @@ export default function LocationPicker({ location, onLocationChange, radiusKm, o
             <Compass className="w-4 h-4" />
           </div>
           <div>
-            <div className="font-semibold text-sm text-[#252525]">Chọn trên bản đồ</div>
+            <div className="font-semibold text-sm text-[#252525]">Chấm điểm trên bản đồ</div>
             <div className="text-xs text-[#6B6B6B]">
-              {showMapPicker ? 'Đang mở bản đồ' : 'Bấm để mở bản đồ chọn điểm'}
+              {showMapPicker ? 'Đang mở bản đồ chọn điểm' : 'Bấm để mở bản đồ'}
             </div>
           </div>
         </button>
@@ -138,7 +162,7 @@ export default function LocationPicker({ location, onLocationChange, radiusKm, o
         </div>
       )}
 
-      {/* Interactive Map Picker (when opened or when GPS fails) */}
+      {/* Interactive Map Picker */}
       {showMapPicker && (
         <div className="p-3.5 bg-white border border-[#EAE5DF] rounded-2xl space-y-2">
           <div className="flex items-center justify-between text-xs font-bold text-[#252525]">
@@ -155,69 +179,23 @@ export default function LocationPicker({ location, onLocationChange, radiusKm, o
                 type: 'manual',
                 lat,
                 lng,
-                address: address || `Tọa độ ${lat}, ${lng}`,
+                address: address || `Vị trí đã chọn`,
               });
             }}
           />
         </div>
       )}
 
-      {/* Quick district buttons for Hanoi */}
-      <div className="space-y-1.5">
-        <span className="text-xs font-medium text-[#6B6B6B]">Chọn nhanh khu vực Hà Nội:</span>
-        <div className="flex flex-wrap gap-1.5">
-          {PRESET_LOCATIONS.map((preset) => {
-            const isSelected = location?.lat === preset.lat && location?.lng === preset.lng;
-            return (
-              <button
-                key={preset.name}
-                type="button"
-                onClick={() => handleSelectPreset(preset)}
-                className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer ${
-                  isSelected
-                    ? 'border-[#FF6B4A] bg-[#FF6B4A] text-white font-medium shadow-xs'
-                    : 'border-[#EAE5DF] bg-white text-[#252525] hover:bg-neutral-50'
-                }`}
-              >
-                {preset.name.replace('Hà Nội - ', '')}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       {/* Current chosen location badge */}
       {location?.lat && (
-        <div className="flex items-center gap-2 p-2.5 bg-neutral-50 border border-[#EAE5DF] rounded-xl text-xs text-[#252525]">
+        <div className="flex items-center gap-2 p-3 bg-neutral-50 border border-[#EAE5DF] rounded-xl text-xs text-[#252525]">
           <CheckCircle2 className="w-4 h-4 text-[#27865A] shrink-0" />
-          <span className="font-medium">Vị trí tìm kiếm:</span>
-          <span className="text-[#6B6B6B] truncate font-semibold">
-            {location.address || 'Đã chọn vị trí trên bản đồ'}
+          <span className="font-medium">Khu vực tìm kiếm:</span>
+          <span className="text-[#252525] truncate font-bold">
+            {location.address || 'Đã chọn vị trí'}
           </span>
         </div>
       )}
-
-      {/* Radius Slider (1..10 km strictly) */}
-      <div className="p-4 bg-white border border-[#EAE5DF] rounded-xl space-y-2">
-        <div className="flex items-center justify-between text-sm">
-          <span className="font-semibold text-[#252525]">Bán kính tìm kiếm (Đường chim bay):</span>
-          <span className="font-bold text-[#FF6B4A] text-base">{radiusKm} km</span>
-        </div>
-        <input
-          type="range"
-          min="1"
-          max="10"
-          step="1"
-          value={radiusKm}
-          onChange={(e) => onRadiusChange(Number(e.target.value))}
-          className="w-full accent-[#FF6B4A] cursor-pointer"
-        />
-        <div className="flex justify-between text-[11px] text-[#6B6B6B]">
-          <span>1 km (Gần ngay đây)</span>
-          <span>5 km (Tiêu chuẩn)</span>
-          <span>10 km (Tối đa)</span>
-        </div>
-      </div>
     </div>
   );
 }

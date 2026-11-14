@@ -33,7 +33,7 @@ export default function ExplorePage() {
       const params = new URLSearchParams({
         lat: String(preferences.location?.lat || 21.0285),
         lng: String(preferences.location?.lng || 105.8542),
-        radiusKm: String(preferences.radiusKm || 10),
+        radiusKm: '10',
         diningType: preferences.diningType,
         limit: '20',
         sort: 'distance',
@@ -54,7 +54,6 @@ export default function ExplorePage() {
   }, [
     preferences.location?.lat,
     preferences.location?.lng,
-    preferences.radiusKm,
     preferences.diningType,
   ]);
 
@@ -70,8 +69,9 @@ export default function ExplorePage() {
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-neutral-100 text-[#252525]">
             <MapPin className="w-3.5 h-3.5 text-[#FF6B4A]" />
-            <span className="max-w-[180px] truncate">{preferences.location?.address || 'Vị trí đã chọn'}</span>
-            <span className="font-bold">({preferences.radiusKm} km)</span>
+            <span className="max-w-[220px] truncate font-medium">
+              {preferences.location?.address || 'Khu vực đã chọn'}
+            </span>
           </div>
         </div>
 
@@ -79,7 +79,7 @@ export default function ExplorePage() {
           <Link to="/">
             <Button variant="ghost" size="sm">
               <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5" />
-              Sửa bộ lọc
+              Đổi khu vực & món
             </Button>
           </Link>
           <Button
@@ -96,7 +96,7 @@ export default function ExplorePage() {
       {/* View Switcher + Results header */}
       <div className="flex items-center justify-between">
         <h1 className="text-xl sm:text-2xl font-extrabold text-[#252525]">
-          Quán ngon gần bạn
+          Quán ngon khu vực này
         </h1>
 
         <div className="flex gap-1 p-1 bg-white border border-[#EAE5DF] rounded-xl">
@@ -139,7 +139,6 @@ export default function ExplorePage() {
         <div className="space-y-3">
           <RestaurantMap
             center={preferences.location}
-            radiusKm={preferences.radiusKm}
             restaurants={restaurants}
           />
           <div className="p-3 bg-white border border-[#EAE5DF] rounded-xl text-xs text-[#6B6B6B] flex items-center justify-between">

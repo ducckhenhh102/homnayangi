@@ -74,7 +74,7 @@ export default function WheelPage() {
 
   useEffect(() => {
     loadCandidates();
-  }, [mode, preferences.location?.lat, preferences.location?.lng, preferences.radiusKm, preferences.diningType]);
+  }, [mode, preferences.location?.lat, preferences.location?.lng, preferences.diningType]);
 
   const handleSpin = async () => {
     if (spinning || candidates.length === 0) return;
@@ -91,7 +91,7 @@ export default function WheelPage() {
           filters: {
             lat: preferences.location?.lat || 21.0285,
             lng: preferences.location?.lng || 105.8542,
-            radiusKm: preferences.radiusKm || 10,
+            radiusKm: 10,
             diningType: preferences.diningType,
           },
         }),
@@ -176,9 +176,9 @@ export default function WheelPage() {
 
       {emptyState ? (
         <EmptyState
-          title="Không có ứng viên nào trong bán kính"
-          description={`Không tìm thấy ${mode === 'restaurant' ? 'quán ăn' : 'món ăn'} nào thỏa mãn bộ lọc trong phạm vi ${preferences.radiusKm} km của bạn.`}
-          actionLabel="Tùy chỉnh lại bộ lọc"
+          title="Không tìm thấy quán nào tại khu vực này"
+          description={`Không tìm thấy ${mode === 'restaurant' ? 'quán ăn' : 'món ăn'} nào thỏa mãn tiêu chí tại khu vực bạn đã chọn.`}
+          actionLabel="Chọn lại khu vực"
           onAction={() => window.location.href = '/'}
         />
       ) : (

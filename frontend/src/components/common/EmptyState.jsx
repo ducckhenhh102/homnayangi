@@ -4,8 +4,8 @@ import Button from './Button';
 
 export default function EmptyState({
   icon: Icon = SearchX,
-  title = 'Chưa tìm thấy quán trong bán kính 10 km',
-  description = 'Hãy thử điều chỉnh bán kính tìm kiếm hoặc thay đổi tiêu chí lựa chọn người đi cùng và phong cách ăn.',
+  title = 'Chưa tìm thấy quán ăn phù hợp',
+  description = 'Hãy thử chọn khu vực khác hoặc thay đổi kiểu món ăn.',
   actionLabel,
   onAction,
   className = '',

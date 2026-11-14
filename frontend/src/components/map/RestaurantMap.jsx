@@ -1,13 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
-import { Navigation, ExternalLink, MapPin } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { MapPin } from 'lucide-react';
 
-export default function RestaurantMap({ center, radiusKm = 10, restaurants = [], selectedId, onSelectRestaurant }) {
+export default function RestaurantMap({ center, restaurants = [], selectedId, onSelectRestaurant }) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersLayerRef = useRef(null);
-  const circleRef = useRef(null);
 
   const userLat = center?.lat || 21.0285;
   const userLng = center?.lng || 105.8542;
@@ -40,34 +38,20 @@ export default function RestaurantMap({ center, radiusKm = 10, restaurants = [],
     };
   }, []);
 
-  // Update center, radius circle, and markers
+  // Update center and markers
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
     // Center map
-    map.setView([userLat, userLng], radiusKm <= 3 ? 14 : radiusKm <= 6 ? 13 : 12);
+    map.setView([userLat, userLng], 13);
 
-    // Clear previous markers & circle
+    // Clear previous markers
     if (markersLayerRef.current) {
       markersLayerRef.current.clearLayers();
     }
-    if (circleRef.current) {
-      map.removeLayer(circleRef.current);
-    }
 
-    // 1. Draw radius circle
-    const circle = L.circle([userLat, userLng], {
-      color: '#FF6B4A',
-      fillColor: '#FF6B4A',
-      fillOpacity: 0.08,
-      weight: 2,
-      dashArray: '6, 8',
-      radius: radiusKm * 1000,
-    }).addTo(map);
-    circleRef.current = circle;
-
-    // 2. User Center Pin
+    // 1. User Center Pin
     const userIcon = L.divIcon({
       className: 'custom-user-marker',
       html: `
@@ -95,13 +79,13 @@ export default function RestaurantMap({ center, radiusKm = 10, restaurants = [],
     L.marker([userLat, userLng], { icon: userIcon, zIndexOffset: 1000 })
       .bindPopup(
         `<div style="font-family: inherit; font-size: 13px; text-align: center; padding: 4px;">
-          <strong>Vị trí của bạn</strong><br/>
-          <span style="color: #6B6B6B; font-size: 11px;">Bán kính tìm kiếm: ${radiusKm} km</span>
+          <strong>Vị trí đã chọn</strong><br/>
+          <span style="color: #6B6B6B; font-size: 11px;">Điểm trung tâm khu vực</span>
         </div>`
       )
       .addTo(markersLayerRef.current);
 
-    // 3. Restaurant Markers
+    // 2. Restaurant Markers
     restaurants.forEach((r) => {
       const lat = r.location?.lat;
       const lng = r.location?.lng;
@@ -171,7 +155,7 @@ export default function RestaurantMap({ center, radiusKm = 10, restaurants = [],
         if (onSelectRestaurant) onSelectRestaurant(r.id);
       });
     });
-  }, [userLat, userLng, radiusKm, restaurants, selectedId]);
+  }, [userLat, userLng, restaurants, selectedId]);
 
   return (
     <div className="relative w-full h-[520px] rounded-2xl overflow-hidden border border-[#EAE5DF] shadow-xs">
@@ -180,12 +164,12 @@ export default function RestaurantMap({ center, radiusKm = 10, restaurants = [],
       {/* Map floating overlay info */}
       <div className="absolute top-3 left-3 z-[400] bg-white/95 backdrop-blur-xs px-3.5 py-2 rounded-xl border border-[#EAE5DF] shadow-sm text-xs font-medium text-[#252525] flex items-center gap-2">
         <MapPin className="w-3.5 h-3.5 text-[#FF6B4A]" />
-        <span>Bán kính tìm kiếm: <strong>{radiusKm} km</strong></span>
-        <span className="text-[#6B6B6B]">({restaurants.length} quán)</span>
+        <span>Khu vực tìm kiếm</span>
+        <span className="text-[#6B6B6B]">({restaurants.length} quán quanh đây)</span>
       </div>
 
       <div className="absolute bottom-3 left-3 z-[400] bg-white/90 backdrop-blur-xs px-3 py-1.5 rounded-lg border border-[#EAE5DF] text-[11px] text-[#6B6B6B]">
-        Dữ liệu bản đồ &copy; OpenStreetMap | Khoảng cách đường chim bay
+        Dữ liệu bản đồ &copy; OpenStreetMap
       </div>
     </div>
   );

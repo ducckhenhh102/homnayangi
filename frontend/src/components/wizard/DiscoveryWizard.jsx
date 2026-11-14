@@ -8,7 +8,7 @@ import { Compass, Disc3 } from 'lucide-react';
 
 export default function DiscoveryWizard() {
   const navigate = useNavigate();
-  const { preferences, setDiningType, setRadiusKm, setLocation } = useDiscovery();
+  const { preferences, setDiningType, setLocation } = useDiscovery();
 
   const isLocationValid = Boolean(preferences.location?.lat && preferences.location?.lng);
 
@@ -24,7 +24,7 @@ export default function DiscoveryWizard() {
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#EAE5DF] shadow-[0_6px_24px_rgba(37,37,37,0.06)] space-y-8 max-w-3xl mx-auto">
-      {/* Bước 1: Nhu cầu ăn uống */}
+      {/* Nhu cầu ăn uống */}
       <DiningTypePicker
         value={preferences.diningType}
         onChange={setDiningType}
@@ -32,12 +32,10 @@ export default function DiscoveryWizard() {
 
       <div className="border-t border-[#EAE5DF]" />
 
-      {/* Bước 2: Vị trí & Bán kính */}
+      {/* Vị trí / Khu vực */}
       <LocationPicker
         location={preferences.location}
         onLocationChange={setLocation}
-        radiusKm={preferences.radiusKm}
-        onRadiusChange={setRadiusKm}
       />
 
       <div className="border-t border-[#EAE5DF]" />
