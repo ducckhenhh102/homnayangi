@@ -1,10 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import healthRouter from './routes/health.route.js';
 import discoveryRouter from './routes/discovery.route.js';
 import restaurantRouter from './routes/restaurant.route.js';
+import authRouter from './routes/auth.route.js';
+import adminRouter from './routes/admin.route.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
@@ -34,11 +37,14 @@ app.use(
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+app.use(cookieParser());
 
 // Base API v1 Routes
 app.use('/api/v1', healthRouter);
 app.use('/api/v1', discoveryRouter);
 app.use('/api/v1', restaurantRouter);
+app.use('/api/v1', authRouter);
+app.use('/api/v1', adminRouter);
 
 // Catch-all 404
 app.use(notFoundHandler);
