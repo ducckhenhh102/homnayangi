@@ -5,6 +5,7 @@ import PageTitle from '../components/common/PageTitle';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import MapLocationPicker from '../components/common/MapLocationPicker';
+import ImageUpload from '../components/common/ImageUpload';
 import { fetchApi } from '../utils/api';
 import { ArrowLeft, CheckCircle2, MapPin, Share2, AlertCircle, Coffee, UtensilsCrossed, Beer, Sparkles } from 'lucide-react';
 
@@ -35,6 +36,7 @@ export default function SubmitRestaurantPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState(null);
 
   // Get current GPS
   const handleGetCurrentLocation = () => {
@@ -101,6 +103,8 @@ export default function SubmitRestaurantPage() {
         diningTypes: formData.diningTypes,
         priceMin: formData.priceMin ? parseInt(formData.priceMin, 10) : null,
         priceMax: formData.priceMax ? parseInt(formData.priceMax, 10) : null,
+        imageUrl: uploadedImage?.secureUrl || null,
+        cloudinaryPublicId: uploadedImage?.cloudinaryPublicId || null,
         submitterName: formData.submitterName.trim() || null,
         submitterContact: formData.submitterContact.trim() || null,
         note: formData.note.trim() || null,
@@ -139,6 +143,7 @@ export default function SubmitRestaurantPage() {
               variant="primary"
               onClick={() => {
                 setSuccess(false);
+                setUploadedImage(null);
                 setFormData({
                   name: '',
                   address: '',
@@ -295,6 +300,18 @@ export default function SubmitRestaurantPage() {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             />
+          </div>
+
+          {/* Ảnh quán do người dùng chụp / chia sẻ */}
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-[#252525] uppercase tracking-wider">
+              Ảnh chụp thực tế quán ăn / Món ăn (Tùy chọn)
+            </label>
+            <div className="p-4 bg-neutral-50 rounded-2xl border border-[#EAE5DF]">
+              <ImageUpload
+                onUploadSuccess={(res) => setUploadedImage(res)}
+              />
+            </div>
           </div>
 
           {/* Người chia sẻ */}

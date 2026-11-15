@@ -528,6 +528,20 @@ router.post('/admin/submissions/:id/approve', async (req, res, next) => {
       },
     });
 
+    // If submission had an uploaded image, attach it to the new restaurant
+    if (submission.imageUrl && submission.cloudinaryPublicId) {
+      await prisma.restaurantImage.create({
+        data: {
+          restaurantId: createdRestaurant.id,
+          cloudinaryPublicId: submission.cloudinaryPublicId,
+          secureUrl: submission.imageUrl,
+          altText: `Ảnh quán ${submission.name}`,
+          sortOrder: 0,
+          uploadedBy: submission.submitterName || 'Cộng đồng',
+        },
+      });
+    }
+
     // Update submission status to APPROVED
     await prisma.restaurantSubmission.update({
       where: { id },

@@ -5,7 +5,7 @@ import { fetchApi } from '../../utils/api';
 
 const MAX_SIZE_MB = 5;
 
-export default function ImageUpload({ token, onUploadSuccess, currentImageUrl }) {
+export default function ImageUpload({ token, onUploadSuccess, currentImageUrl, endpoint = null }) {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(currentImageUrl || null);
   const [uploading, setUploading] = useState(false);
@@ -43,10 +43,13 @@ export default function ImageUpload({ token, onUploadSuccess, currentImageUrl })
       setUploading(true);
       setError(null);
 
-      // 1. Get upload signature from backend
-      const sigRes = await fetchApi('/admin/uploads/signature?type=restaurant', {
+      // 1. Get upload signature from backend (admin endpoint or public submission endpoint)
+      const signatureEndpoint = endpoint || (token ? '/admin/uploads/signature?type=restaurant' : '/submissions/upload-signature');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const sigRes = await fetchApi(signatureEndpoint, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        headers,
       });
 
       const { signature, timestamp, apiKey, cloudName, folder } = sigRes.data;

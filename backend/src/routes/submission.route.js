@@ -2,8 +2,19 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { validate } from '../middlewares/validate.js';
 import prisma from '../config/db.js';
+import { generateUploadSignature } from '../integrations/cloudinary.js';
 
 const router = Router();
+
+// Public endpoint for users to get Cloudinary upload signature for submitting restaurant photos
+router.post('/submissions/upload-signature', (req, res, next) => {
+  try {
+    const signatureData = generateUploadSignature('submissions');
+    res.status(200).json({ data: signatureData });
+  } catch (err) {
+    next(err);
+  }
+});
 
 const createSubmissionSchema = z.object({
   body: z.object({
@@ -15,6 +26,8 @@ const createSubmissionSchema = z.object({
     diningTypes: z.array(z.enum(['meal', 'snack', 'drinking'])).min(1, 'Chọn ít nhất 1 loại hình ăn uống'),
     priceMin: z.number().int().positive().optional().nullable(),
     priceMax: z.number().int().positive().optional().nullable(),
+    imageUrl: z.string().optional().nullable(),
+    cloudinaryPublicId: z.string().optional().nullable(),
     submitterName: z.string().max(100).optional().nullable(),
     submitterContact: z.string().max(100).optional().nullable(),
     note: z.string().max(500).optional().nullable(),
@@ -36,6 +49,8 @@ router.post('/submissions', validate(createSubmissionSchema), async (req, res, n
         diningTypes: data.diningTypes,
         priceMin: data.priceMin || null,
         priceMax: data.priceMax || null,
+        imageUrl: data.imageUrl || null,
+        cloudinaryPublicId: data.cloudinaryPublicId || null,
         submitterName: data.submitterName ? data.submitterName.trim() : null,
         submitterContact: data.submitterContact ? data.submitterContact.trim() : null,
         note: data.note ? data.note.trim() : null,

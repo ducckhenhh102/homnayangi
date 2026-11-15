@@ -199,6 +199,8 @@ model RestaurantSubmission {
   diningTypes      String[]         @default(["meal"]) @map("dining_types")
   priceMin         Int?             @map("price_min")
   priceMax         Int?             @map("price_max")
+  imageUrl         String?          @map("image_url") @db.Text
+  cloudinaryPublicId String?        @map("cloudinary_public_id") @db.VarChar(255)
   submitterName    String?          @map("submitter_name") @db.VarChar(100)
   submitterContact String?          @map("submitter_contact") @db.VarChar(100)
   note             String?          @db.Text
