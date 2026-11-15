@@ -190,7 +190,10 @@ export default function MapLocationPicker({
 
   // Search Address via Backend Geocode (Robust, no CORS issues, instant dictionary fallback)
   const handleSearchAddress = async (e) => {
-    if (e) e.preventDefault();
+    if (e) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    }
     if (!searchQuery || !searchQuery.trim()) return;
 
     try {
@@ -204,14 +207,16 @@ export default function MapLocationPicker({
         const foundLat = Number(res.data.lat);
         const foundLng = Number(res.data.lng);
 
-        if (mapInstanceRef.current && markerRef.current) {
-          markerRef.current.setLatLng([foundLat, foundLng]);
+        if (mapInstanceRef.current) {
           mapInstanceRef.current.setView([foundLat, foundLng], 15);
         }
+        if (markerRef.current) {
+          markerRef.current.setLatLng([foundLat, foundLng]);
+        }
         handleUpdateCoords(foundLat, foundLng, res.data.displayName || query);
-        setGpsMessage({ type: 'success', text: `Đã tìm thấy: ${res.data.displayName || query}` });
+        setGpsMessage({ type: 'success', text: `Đã ghim vị trí: ${res.data.displayName || query}` });
       } else {
-        setGpsMessage({ type: 'error', text: 'Không tìm thấy địa chỉ này. Bạn hãy bấm trực tiếp trên bản đồ để chọn điểm!' });
+        setGpsMessage({ type: 'error', text: `Không tìm thấy vị trí "${query}". Bạn hãy chọn quận bên dưới hoặc bấm trực tiếp trên bản đồ!` });
       }
     } catch (err) {
       // Local fallback to presets in case backend geocode returns 404
@@ -223,9 +228,12 @@ export default function MapLocationPicker({
 
       if (match) {
         handleSelectPreset(match);
-        setGpsMessage({ type: 'success', text: `Đã tìm thấy khu vực: ${match.name}` });
+        setGpsMessage({ type: 'success', text: `Đã ghim vị trí khu vực: ${match.name}` });
       } else {
-        setGpsMessage({ type: 'error', text: err.message || 'Không tìm thấy địa chỉ này. Bạn hãy bấm trực tiếp trên bản đồ để chọn vị trí!' });
+        setGpsMessage({
+          type: 'error',
+          text: `Không tìm thấy vị trí "${searchQuery.trim()}". Bạn hãy chọn quận bên dưới hoặc bấm trực tiếp trên bản đồ!`,
+        });
       }
     } finally {
       setSearchLoading(false);
@@ -248,27 +256,35 @@ export default function MapLocationPicker({
       {(showSearch || showGpsButton) && (
         <div className="flex flex-col sm:flex-row gap-2">
           {showSearch && (
-            <form onSubmit={handleSearchAddress} className="flex-1 flex gap-1.5">
+            <div className="flex-1 flex gap-1.5">
               <div className="relative flex-1">
                 <input
                   type="text"
                   placeholder="Nhập tên đường, địa chỉ hoặc phố (ví dụ: Bát Đàn, Cầu Giấy)..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleSearchAddress(e);
+                    }
+                  }}
                   className="w-full text-xs py-2 pl-8 pr-3 rounded-xl border border-[#EAE5DF] bg-white focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
                 />
                 <Search className="w-3.5 h-3.5 text-[#6B6B6B] absolute left-2.5 top-2.5" />
               </div>
               <Button
-                type="submit"
+                type="button"
                 variant="secondary"
                 size="sm"
+                onClick={handleSearchAddress}
                 disabled={searchLoading}
-                className="text-xs shrink-0"
+                className="text-xs shrink-0 cursor-pointer"
               >
                 {searchLoading ? 'Đang tìm...' : 'Tìm vị trí'}
               </Button>
-            </form>
+            </div>
           )}
 
           {showGpsButton && (

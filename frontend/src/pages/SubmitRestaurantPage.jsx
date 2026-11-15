@@ -231,7 +231,7 @@ export default function SubmitRestaurantPage() {
                   ...prev,
                   latitude: String(lat),
                   longitude: String(lng),
-                  address: prev.address ? prev.address : address,
+                  address: address || prev.address,
                 }));
               }}
               height="280px"
