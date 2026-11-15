@@ -8,14 +8,17 @@ export function errorHandler(err, req, res, next) {
 
   // Zod validation error
   if (err instanceof ZodError) {
+    const errorDetails = err.errors.map((e) => ({
+      path: e.path.join('.'),
+      message: e.message,
+    }));
+    const summaryMsg = errorDetails.map((d) => d.message).filter(Boolean).join('; ') || 'Dữ liệu yêu cầu không hợp lệ.';
+
     return res.status(400).json({
       error: {
         code: 'VALIDATION_ERROR',
-        message: 'Dữ liệu yêu cầu không hợp lệ.',
-        details: err.errors.map((e) => ({
-          path: e.path.join('.'),
-          message: e.message,
-        })),
+        message: summaryMsg,
+        details: errorDetails,
       },
     });
   }

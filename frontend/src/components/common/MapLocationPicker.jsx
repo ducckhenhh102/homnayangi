@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { MapPin, Navigation, Search, CheckCircle2, AlertCircle } from 'lucide-react';
 import Button from './Button';
+import { fetchApi } from '../../utils/api';
 
 const HANOI_DISTRICT_PRESETS = [
   { name: 'Hoàn Kiếm', lat: 21.0285, lng: 105.8544 },
@@ -187,41 +188,45 @@ export default function MapLocationPicker({
     handleUpdateCoords(gpsLat, gpsLng, 'Vị trí hiện tại của bạn (GPS)');
   };
 
-  // Search Address via OpenStreetMap Nominatim
+  // Search Address via Backend Geocode (Robust, no CORS issues, instant dictionary fallback)
   const handleSearchAddress = async (e) => {
     if (e) e.preventDefault();
-    if (!searchQuery.trim()) return;
+    if (!searchQuery || !searchQuery.trim()) return;
 
     try {
       setSearchLoading(true);
       setGpsMessage(null);
 
-      let query = searchQuery.trim();
-      if (!query.toLowerCase().includes('hà nội') && !query.toLowerCase().includes('hanoi')) {
-        query += ', Hà Nội';
-      }
+      const query = searchQuery.trim();
+      const res = await fetchApi(`/geocode?q=${encodeURIComponent(query)}`);
 
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
-        { headers: { 'User-Agent': 'HomNayAnGi-App/1.0' } }
-      );
-
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        const foundLat = parseFloat(data[0].lat);
-        const foundLng = parseFloat(data[0].lon);
+      if (res && res.data) {
+        const foundLat = Number(res.data.lat);
+        const foundLng = Number(res.data.lng);
 
         if (mapInstanceRef.current && markerRef.current) {
           markerRef.current.setLatLng([foundLat, foundLng]);
           mapInstanceRef.current.setView([foundLat, foundLng], 15);
         }
-        handleUpdateCoords(foundLat, foundLng, data[0].display_name);
-        setGpsMessage({ type: 'success', text: `Đã tìm thấy tọa độ cho: ${searchQuery}` });
+        handleUpdateCoords(foundLat, foundLng, res.data.displayName || query);
+        setGpsMessage({ type: 'success', text: `Đã tìm thấy: ${res.data.displayName || query}` });
       } else {
         setGpsMessage({ type: 'error', text: 'Không tìm thấy địa chỉ này. Bạn hãy bấm trực tiếp trên bản đồ để chọn điểm!' });
       }
     } catch (err) {
-      setGpsMessage({ type: 'error', text: 'Lỗi tra cứu địa chỉ. Bạn hãy bấm trực tiếp trên bản đồ!' });
+      // Local fallback to presets in case backend geocode returns 404
+      const normQ = searchQuery.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const match = HANOI_DISTRICT_PRESETS.find((p) => {
+        const normP = p.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        return normQ.includes(normP) || normP.includes(normQ);
+      });
+
+      if (match) {
+        handleSelectPreset(match);
+        setGpsMessage({ type: 'success', text: `Đã tìm thấy khu vực: ${match.name}` });
+      } else {
+        setGpsMessage({ type: 'error', text: err.message || 'Không tìm thấy địa chỉ này. Bạn hãy bấm trực tiếp trên bản đồ để chọn vị trí!' });
+      }
     } finally {
       setSearchLoading(false);
     }

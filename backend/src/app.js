@@ -10,6 +10,7 @@ import authRouter from './routes/auth.route.js';
 import adminRouter from './routes/admin.route.js';
 import wheelRouter from './routes/wheel.route.js';
 import submissionRouter from './routes/submission.route.js';
+import geocodeRouter from './routes/geocode.route.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
@@ -51,6 +52,7 @@ app.use('/api/v1', authRouter);
 app.use('/api/v1', adminRouter);
 app.use('/api/v1', wheelRouter);
 app.use('/api/v1', submissionRouter);
+app.use('/api/v1', geocodeRouter);
 
 // Catch-all 404
 app.use(notFoundHandler);

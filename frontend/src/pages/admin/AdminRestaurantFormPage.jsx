@@ -9,7 +9,7 @@ import MapLocationPicker from '../../components/common/MapLocationPicker';
 import Skeleton from '../../components/common/Skeleton';
 import { useAuth } from '../../context/AuthContext';
 import { fetchApi } from '../../utils/api';
-import { ArrowLeft, PlusCircle, AlertCircle, MapPin, Save } from 'lucide-react';
+import { ArrowLeft, PlusCircle, AlertCircle, MapPin, Save, UtensilsCrossed, Trash2, Plus } from 'lucide-react';
 
 function slugify(text) {
   return text
@@ -51,6 +51,9 @@ export default function AdminRestaurantFormPage() {
   const [initialLoading, setInitialLoading] = useState(isEditMode);
   const [error, setError] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [foodItems, setFoodItems] = useState([
+    { name: '', priceVnd: '', category: 'Món đặc trưng' },
+  ]);
 
   useEffect(() => {
     if (!authLoading && (!isAuthenticated || !isAdmin)) {
@@ -87,6 +90,16 @@ export default function AdminRestaurantFormPage() {
                 { companionTypeId: 'solo', score: 70 },
               ],
             });
+
+            if (r.foods && r.foods.length > 0) {
+              setFoodItems(
+                r.foods.map((rf) => ({
+                  name: rf.food?.name || '',
+                  priceVnd: rf.priceVnd != null ? String(rf.priceVnd) : (rf.food?.priceVnd ? String(rf.food.priceVnd) : ''),
+                  category: rf.food?.category || 'Món đặc trưng',
+                }))
+              );
+            }
           }
         })
         .catch((err) => {
@@ -105,6 +118,14 @@ export default function AdminRestaurantFormPage() {
     }));
   };
 
+  const handleSlugChange = (e) => {
+    const val = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      slug: slugify(val),
+    }));
+  };
+
   const handleDiningToggle = (dtId) => {
     setFormData((prev) => {
       const exists = prev.diningTypeIds.includes(dtId);
@@ -118,23 +139,52 @@ export default function AdminRestaurantFormPage() {
     });
   };
 
+  const handleAddFoodItem = () => {
+    setFoodItems((prev) => [...prev, { name: '', priceVnd: '', category: 'Món đặc trưng' }]);
+  };
+
+  const handleRemoveFoodItem = (index) => {
+    setFoodItems((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleFoodItemChange = (index, field, value) => {
+    setFoodItems((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
+      const parsedLat = parseFloat(formData.latitude) || 21.0285;
+      const parsedLng = parseFloat(formData.longitude) || 105.8542;
+      const finalAddress = formData.address.trim().length >= 5
+        ? formData.address.trim()
+        : `Tọa độ ${parsedLat.toFixed(4)}, ${parsedLng.toFixed(4)}, Hà Nội`;
+
+      const validFoods = foodItems
+        .filter((f) => f.name && f.name.trim().length > 0)
+        .map((f) => ({
+          name: f.name.trim(),
+          priceVnd: f.priceVnd ? parseInt(f.priceVnd, 10) : null,
+          category: f.category || 'Món đặc trưng',
+        }));
+
       const payload = {
         name: formData.name.trim(),
-        slug: formData.slug.trim(),
-        address: formData.address.trim(),
-        latitude: parseFloat(formData.latitude),
-        longitude: parseFloat(formData.longitude),
+        slug: slugify(formData.slug) || slugify(formData.name) || `quan-${Date.now()}`,
+        address: finalAddress,
+        latitude: parsedLat,
+        longitude: parsedLng,
         description: formData.description.trim() || null,
         priceMin: formData.priceMin ? parseInt(formData.priceMin, 10) : null,
         priceMax: formData.priceMax ? parseInt(formData.priceMax, 10) : null,
         status: formData.status,
         diningTypeIds: formData.diningTypeIds,
+        foodItems: validFoods,
       };
 
       if (isEditMode) {
@@ -175,8 +225,9 @@ export default function AdminRestaurantFormPage() {
         });
 
         // If image was uploaded to Cloudinary, attach it to the new restaurant
-        if (uploadedImage && created.data?.rawId) {
-          await fetchApi(`/admin/restaurants/${created.data.rawId}/images`, {
+        const newId = created.data?.rawId || created.data?.id?.replace('internal:', '');
+        if (uploadedImage && newId) {
+          await fetchApi(`/admin/restaurants/${newId}/images`, {
             method: 'POST',
             headers: {
               Authorization: `Bearer ${token}`,
@@ -194,7 +245,8 @@ export default function AdminRestaurantFormPage() {
 
       navigate('/admin/restaurants');
     } catch (err) {
-      setError(err.message || `Không thể ${isEditMode ? 'cập nhật' : 'tạo'} quán ăn.`);
+      const detailsMsg = err.details?.map((d) => d.message).filter(Boolean).join('; ');
+      setError(detailsMsg ? `${err.message} (${detailsMsg})` : (err.message || `Không thể ${isEditMode ? 'cập nhật' : 'tạo'} quán ăn.`));
     } finally {
       setLoading(false);
     }
@@ -244,13 +296,18 @@ export default function AdminRestaurantFormPage() {
               onChange={handleNameChange}
               required
             />
-            <Input
-              label="Slug (đường dẫn) *"
-              placeholder="bun-cha-sinh-tu"
-              value={formData.slug}
-              onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-              required
-            />
+            <div>
+              <Input
+                label="Slug (đường dẫn URL) *"
+                placeholder="bun-cha-sinh-tu"
+                value={formData.slug}
+                onChange={handleSlugChange}
+                required
+              />
+              <span className="block text-[11px] text-[#6B6B6B] mt-1 truncate">
+                Đường dẫn xem: /restaurants/<strong>{formData.slug || 'slug-quan-an'}</strong>
+              </span>
+            </div>
           </div>
 
           <Input
@@ -365,6 +422,77 @@ export default function AdminRestaurantFormPage() {
             </select>
           </div>
 
+          {/* Food Menu Items */}
+          <div className="p-4 bg-neutral-50 rounded-2xl border border-[#EAE5DF] space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <UtensilsCrossed className="w-4 h-4 text-[#FF6B4A]" />
+                <span className="text-sm font-bold text-[#252525]">Món ăn tiêu biểu của quán (Tùy chọn)</span>
+              </div>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={handleAddFoodItem}
+                className="text-xs"
+              >
+                <Plus className="w-3.5 h-3.5 mr-1" />
+                Thêm món
+              </Button>
+            </div>
+            <p className="text-xs text-[#6B6B6B]">
+              Thêm các món ăn nổi bật hoặc đặc sản để hiển thị trong thực đơn chi tiết của quán.
+            </p>
+
+            {foodItems.length === 0 ? (
+              <div className="text-center py-4 text-xs text-[#6B6B6B] bg-white rounded-xl border border-dashed border-[#EAE5DF]">
+                Chưa có món nào. Bấm <strong>"+ Thêm món"</strong> để thêm món ăn cho quán.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {foodItems.map((item, idx) => (
+                  <div key={idx} className="flex flex-col sm:flex-row items-center gap-2 bg-white p-2.5 rounded-xl border border-[#EAE5DF]">
+                    <div className="flex-1 w-full">
+                      <input
+                        type="text"
+                        placeholder="Tên món (VD: Nem rán giòn, Trà sữa trân châu)..."
+                        value={item.name}
+                        onChange={(e) => handleFoodItemChange(idx, 'name', e.target.value)}
+                        className="w-full text-xs py-1.5 px-3 rounded-lg border border-[#EAE5DF] focus:outline-none focus:ring-1 focus:ring-[#FF6B4A]"
+                      />
+                    </div>
+                    <div className="w-full sm:w-36">
+                      <input
+                        type="number"
+                        placeholder="Giá (VNĐ)"
+                        value={item.priceVnd}
+                        onChange={(e) => handleFoodItemChange(idx, 'priceVnd', e.target.value)}
+                        className="w-full text-xs py-1.5 px-3 rounded-lg border border-[#EAE5DF] focus:outline-none focus:ring-1 focus:ring-[#FF6B4A]"
+                      />
+                    </div>
+                    <div className="w-full sm:w-36">
+                      <input
+                        type="text"
+                        placeholder="Nhóm (VD: Món chính)"
+                        value={item.category}
+                        onChange={(e) => handleFoodItemChange(idx, 'category', e.target.value)}
+                        className="w-full text-xs py-1.5 px-3 rounded-lg border border-[#EAE5DF] focus:outline-none focus:ring-1 focus:ring-[#FF6B4A]"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFoodItem(idx)}
+                      className="p-1.5 text-neutral-400 hover:text-red-500 rounded-lg hover:bg-red-50 cursor-pointer shrink-0 transition-colors"
+                      title="Xóa món này"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Description */}
           <div>
             <label className="block text-sm font-semibold text-[#252525] mb-1.5">
@@ -378,6 +506,13 @@ export default function AdminRestaurantFormPage() {
               className="w-full p-3.5 bg-white border border-[#EAE5DF] rounded-xl text-sm text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
             />
           </div>
+
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-[#C73535] flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
 
           <div className="pt-4 border-t border-[#EAE5DF] flex items-center justify-end gap-3">
             <Link to="/admin/restaurants">

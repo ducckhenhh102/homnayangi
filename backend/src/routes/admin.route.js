@@ -8,6 +8,19 @@ import { generateUploadSignature, destroyImage } from '../integrations/cloudinar
 
 const router = Router();
 
+function slugify(text) {
+  if (!text) return '';
+  return text
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[đĐ]/g, 'd')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
 // Apply auth + admin guard to /admin routes
 router.use('/admin', requireAuth, requireAdmin);
 
@@ -15,18 +28,23 @@ router.use('/admin', requireAuth, requireAdmin);
 const restaurantCreateSchema = z.object({
   body: z.object({
     name: z.string().min(2, 'Tên quán tối thiểu 2 ký tự').max(200),
-    slug: z.string().min(2, 'Slug tối thiểu 2 ký tự').max(240).regex(/^[a-z0-9-]+$/, 'Slug chỉ bao gồm chữ thường, số và dấu gạch ngang'),
-    address: z.string().min(5, 'Địa chỉ tối thiểu 5 ký tự'),
-    latitude: z.number().min(-90).max(90),
-    longitude: z.number().min(-180).max(180),
+    slug: z.string().optional().nullable(),
+    address: z.string().optional().nullable(),
+    latitude: z.union([z.number(), z.string().transform((v) => parseFloat(v))]),
+    longitude: z.union([z.number(), z.string().transform((v) => parseFloat(v))]),
     description: z.string().optional().nullable(),
-    priceMin: z.number().int().nonnegative().optional().nullable(),
-    priceMax: z.number().int().nonnegative().optional().nullable(),
+    priceMin: z.union([z.number().int().nonnegative(), z.string().transform((v) => (v ? parseInt(v, 10) : null))]).optional().nullable(),
+    priceMax: z.union([z.number().int().nonnegative(), z.string().transform((v) => (v ? parseInt(v, 10) : null))]).optional().nullable(),
     status: z.enum(['DRAFT', 'PUBLISHED', 'HIDDEN']).default('DRAFT'),
     diningTypeIds: z.array(z.enum(['snack', 'meal', 'drinking'])).min(1, 'Chọn ít nhất một kiểu ăn'),
     companionScores: z.array(z.object({
       companionTypeId: z.enum(['couple', 'friends', 'solo']),
       score: z.number().int().min(0).max(100).default(100),
+    })).optional(),
+    foodItems: z.array(z.object({
+      name: z.string().min(1, 'Tên món không được để trống'),
+      priceVnd: z.union([z.number().int().nonnegative(), z.string().transform((v) => (v ? parseInt(v, 10) : null))]).optional().nullable(),
+      category: z.string().optional().nullable(),
     })).optional(),
     foodIds: z.array(z.string()).optional(),
   }).refine((data) => {
@@ -107,27 +125,43 @@ router.post('/admin/restaurants', validate(restaurantCreateSchema), async (req, 
   try {
     const data = req.body;
 
-    // Check slug uniqueness
-    const existing = await prisma.restaurant.findUnique({
-      where: { slug: data.slug },
-    });
-    if (existing) {
-      return res.status(400).json({
-        error: {
-          code: 'SLUG_EXISTS',
-          message: `Slug '${data.slug}' đã tồn tại. Vui lòng chọn slug khác.`,
-        },
-      });
+    // Generate robust slug and check uniqueness
+    const rawSlug = data.slug ? slugify(data.slug) : slugify(data.name);
+    const baseSlug = rawSlug || `quan-${Date.now()}`;
+
+    // If explicit slug was provided, check if it already exists
+    if (data.slug && data.slug.trim()) {
+      const explicitSlug = slugify(data.slug);
+      const existing = await prisma.restaurant.findUnique({ where: { slug: explicitSlug } });
+      if (existing) {
+        return res.status(400).json({
+          error: {
+            code: 'SLUG_EXISTS',
+            message: `Đường dẫn (slug) '${explicitSlug}' đã tồn tại. Vui lòng chọn một slug khác.`,
+          },
+        });
+      }
     }
+
+    let finalSlug = baseSlug;
+    let counter = 1;
+    while (await prisma.restaurant.findUnique({ where: { slug: finalSlug } })) {
+      finalSlug = `${baseSlug}-${counter++}`;
+    }
+
+    // Ensure valid address
+    const finalAddress = (data.address && data.address.trim().length >= 5)
+      ? data.address.trim()
+      : `Tọa độ ${data.latitude.toFixed(4)}, ${data.longitude.toFixed(4)}, Hà Nội`;
 
     const created = await prisma.restaurant.create({
       data: {
-        name: data.name,
-        slug: data.slug,
-        address: data.address,
+        name: data.name.trim(),
+        slug: finalSlug,
+        address: finalAddress,
         latitude: data.latitude,
         longitude: data.longitude,
-        description: data.description || null,
+        description: data.description ? data.description.trim() : null,
         priceMin: data.priceMin ?? null,
         priceMax: data.priceMax ?? null,
         status: data.status,
@@ -156,8 +190,49 @@ router.post('/admin/restaurants', validate(restaurantCreateSchema), async (req, 
       },
     });
 
+    // Create custom food items if provided
+    if (data.foodItems && Array.isArray(data.foodItems) && data.foodItems.length > 0) {
+      for (const item of data.foodItems) {
+        if (!item.name || !item.name.trim()) continue;
+        const foodName = item.name.trim();
+        const baseFoodSlug = slugify(foodName) || `mon-${Date.now()}`;
+        let foodSlug = baseFoodSlug;
+        let fCounter = 1;
+
+        let food = await prisma.food.findUnique({ where: { slug: foodSlug } });
+        if (!food) {
+          food = await prisma.food.create({
+            data: {
+              name: foodName,
+              slug: foodSlug,
+              category: item.category || 'Món đặc trưng',
+            },
+          });
+        }
+
+        await prisma.restaurantFood.create({
+          data: {
+            restaurantId: created.id,
+            foodId: food.id,
+            priceVnd: item.priceVnd != null ? Number(item.priceVnd) : (data.priceMin || 30000),
+          },
+        }).catch(() => {});
+      }
+    }
+
+    // Refetch complete restaurant with foods
+    const fullRestaurant = await prisma.restaurant.findUnique({
+      where: { id: created.id },
+      include: {
+        diningTypes: true,
+        companionTypes: true,
+        images: true,
+        foods: { include: { food: true } },
+      },
+    });
+
     res.status(201).json({
-      data: formatRestaurant(created),
+      data: formatRestaurant(fullRestaurant),
     });
   } catch (err) {
     next(err);
@@ -184,17 +259,17 @@ router.patch('/admin/restaurants/:id', async (req, res, next) => {
     }
 
     // If slug is changed, check uniqueness
+    let patchSlug = undefined;
     if (body.slug && body.slug !== existing.slug) {
-      const slugExists = await prisma.restaurant.findUnique({
-        where: { slug: body.slug },
-      });
-      if (slugExists) {
-        return res.status(400).json({
-          error: {
-            code: 'SLUG_EXISTS',
-            message: `Slug '${body.slug}' đã tồn tại. Vui lòng chọn slug khác.`,
-          },
+      const baseSlug = slugify(body.slug) || existing.slug;
+      patchSlug = baseSlug;
+      let counter = 1;
+      while (true) {
+        const slugExists = await prisma.restaurant.findUnique({
+          where: { slug: patchSlug },
         });
+        if (!slugExists || slugExists.id === id) break;
+        patchSlug = `${baseSlug}-${counter++}`;
       }
     }
 
@@ -202,7 +277,7 @@ router.patch('/admin/restaurants/:id', async (req, res, next) => {
       where: { id },
       data: {
         name: body.name !== undefined ? body.name.trim() : undefined,
-        slug: body.slug !== undefined ? body.slug.trim() : undefined,
+        slug: patchSlug !== undefined ? patchSlug : undefined,
         description: body.description !== undefined ? (body.description?.trim() || null) : undefined,
         address: body.address !== undefined ? body.address.trim() : undefined,
         latitude: body.latitude !== undefined ? Number(body.latitude) : undefined,
@@ -222,8 +297,49 @@ router.patch('/admin/restaurants/:id', async (req, res, next) => {
       },
     });
 
+    // If custom food items provided in PATCH
+    if (body.foodItems && Array.isArray(body.foodItems)) {
+      // Clear old associations
+      await prisma.restaurantFood.deleteMany({ where: { restaurantId: id } });
+
+      for (const item of body.foodItems) {
+        if (!item.name || !item.name.trim()) continue;
+        const foodName = item.name.trim();
+        const foodSlug = slugify(foodName) || `mon-${Date.now()}`;
+
+        let food = await prisma.food.findUnique({ where: { slug: foodSlug } });
+        if (!food) {
+          food = await prisma.food.create({
+            data: {
+              name: foodName,
+              slug: foodSlug,
+              category: item.category || 'Món đặc trưng',
+            },
+          });
+        }
+
+        await prisma.restaurantFood.create({
+          data: {
+            restaurantId: id,
+            foodId: food.id,
+            priceVnd: item.priceVnd != null ? Number(item.priceVnd) : (updated.priceMin || 30000),
+          },
+        }).catch(() => {});
+      }
+    }
+
+    const fullUpdated = await prisma.restaurant.findUnique({
+      where: { id },
+      include: {
+        diningTypes: true,
+        companionTypes: true,
+        images: true,
+        foods: { include: { food: true } },
+      },
+    });
+
     res.status(200).json({
-      data: formatRestaurant(updated),
+      data: formatRestaurant(fullUpdated),
     });
   } catch (err) {
     next(err);
@@ -423,18 +539,6 @@ router.delete('/admin/restaurants/:id/images/:imageId', async (req, res, next) =
     next(err);
   }
 });
-
-function slugify(text) {
-  return text
-    .toString()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[đĐ]/g, 'd')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-');
-}
 
 // 9. List user submissions (separated table)
 router.get('/admin/submissions', async (req, res, next) => {
