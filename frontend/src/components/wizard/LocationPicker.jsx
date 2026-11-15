@@ -156,9 +156,19 @@ export default function LocationPicker({ location, onLocationChange }) {
 
       {/* GPS Error alert */}
       {gpsError && (
-        <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
-          <span>{gpsError}</span>
+        <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-start justify-between gap-2 animate-fadeIn">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+            <span>{gpsError}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setGpsError(null)}
+            className="text-amber-600 hover:text-amber-900 font-bold px-1 rounded cursor-pointer"
+            title="Đóng thông báo"
+          >
+            ✕
+          </button>
         </div>
       )}
 
@@ -166,15 +176,18 @@ export default function LocationPicker({ location, onLocationChange }) {
       {showMapPicker && (
         <div className="p-3.5 bg-white border border-[#EAE5DF] rounded-2xl space-y-2">
           <div className="flex items-center justify-between text-xs font-bold text-[#252525]">
-            <span>BẢN ĐỒ CHỌN ĐIỂM TÙY Ý:</span>
-            <span className="text-[#FF6B4A] font-normal text-[11px]">Bấm vào điểm bất kỳ để chọn</span>
+            <span>BẢN ĐỒ CHỌN ĐIỂM:</span>
+            <span className="text-[#FF6B4A] font-normal text-[11px]">Bấm vào điểm bất kỳ trên bản đồ</span>
           </div>
           <MapLocationPicker
             lat={location?.lat || 21.0285}
             lng={location?.lng || 105.8544}
             height="220px"
             showPresets={false}
+            showGpsButton={false}
+            showCoordsBadge={false}
             onChange={({ lat, lng, address }) => {
+              setGpsError(null);
               onLocationChange({
                 type: 'manual',
                 lat,

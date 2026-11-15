@@ -22,6 +22,8 @@ export default function MapLocationPicker({
   height = '300px',
   showSearch = true,
   showPresets = true,
+  showGpsButton = true,
+  showCoordsBadge = true,
   defaultAddress = '',
 }) {
   const mapContainerRef = useRef(null);
@@ -238,43 +240,47 @@ export default function MapLocationPicker({
   return (
     <div className="space-y-3">
       {/* Top Controls: Search address or GPS button */}
-      <div className="flex flex-col sm:flex-row gap-2">
-        {showSearch && (
-          <form onSubmit={handleSearchAddress} className="flex-1 flex gap-1.5">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                placeholder="Nhập tên đường, địa chỉ hoặc phố (ví dụ: Bát Đàn, Cầu Giấy)..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full text-xs py-2 pl-8 pr-3 rounded-xl border border-[#EAE5DF] bg-white focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
-              />
-              <Search className="w-3.5 h-3.5 text-[#6B6B6B] absolute left-2.5 top-2.5" />
-            </div>
+      {(showSearch || showGpsButton) && (
+        <div className="flex flex-col sm:flex-row gap-2">
+          {showSearch && (
+            <form onSubmit={handleSearchAddress} className="flex-1 flex gap-1.5">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  placeholder="Nhập tên đường, địa chỉ hoặc phố (ví dụ: Bát Đàn, Cầu Giấy)..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full text-xs py-2 pl-8 pr-3 rounded-xl border border-[#EAE5DF] bg-white focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
+                />
+                <Search className="w-3.5 h-3.5 text-[#6B6B6B] absolute left-2.5 top-2.5" />
+              </div>
+              <Button
+                type="submit"
+                variant="secondary"
+                size="sm"
+                disabled={searchLoading}
+                className="text-xs shrink-0"
+              >
+                {searchLoading ? 'Đang tìm...' : 'Tìm vị trí'}
+              </Button>
+            </form>
+          )}
+
+          {showGpsButton && (
             <Button
-              type="submit"
-              variant="secondary"
+              type="button"
+              variant="primary"
               size="sm"
-              disabled={searchLoading}
+              onClick={handleGetGps}
+              disabled={gpsLoading}
               className="text-xs shrink-0"
             >
-              {searchLoading ? 'Đang tìm...' : 'Tìm tọa độ'}
+              <Navigation className={`w-3.5 h-3.5 mr-1 ${gpsLoading ? 'animate-spin' : ''}`} />
+              {gpsLoading ? 'Đang định vị...' : 'Vị trí hiện tại'}
             </Button>
-          </form>
-        )}
-
-        <Button
-          type="button"
-          variant="primary"
-          size="sm"
-          onClick={handleGetGps}
-          disabled={gpsLoading}
-          className="text-xs shrink-0"
-        >
-          <Navigation className={`w-3.5 h-3.5 mr-1 ${gpsLoading ? 'animate-spin' : ''}`} />
-          {gpsLoading ? 'Đang định vị...' : 'Vị trí hiện tại'}
-        </Button>
-      </div>
+          )}
+        </div>
+      )}
 
       {/* Quick district buttons for Hanoi */}
       {showPresets && (
@@ -303,18 +309,27 @@ export default function MapLocationPicker({
       {/* GPS/Search feedback message */}
       {gpsMessage && (
         <div
-          className={`p-2.5 rounded-xl text-xs flex items-center gap-2 ${
+          className={`p-2.5 rounded-xl text-xs flex items-center justify-between gap-2 ${
             gpsMessage.type === 'success'
               ? 'bg-green-50 text-[#27865A] border border-green-200'
               : 'bg-amber-50 text-amber-800 border border-amber-200'
           }`}
         >
-          {gpsMessage.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
-          ) : (
-            <AlertCircle className="w-4 h-4 shrink-0" />
-          )}
-          <span>{gpsMessage.text}</span>
+          <div className="flex items-center gap-2">
+            {gpsMessage.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 shrink-0" />
+            )}
+            <span>{gpsMessage.text}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setGpsMessage(null)}
+            className="text-neutral-400 hover:text-neutral-700 text-xs font-bold px-1.5 py-0.5 rounded cursor-pointer"
+          >
+            ✕
+          </button>
         </div>
       )}
 
@@ -324,14 +339,16 @@ export default function MapLocationPicker({
 
         {/* Floating helper hint */}
         <div className="absolute top-2 left-2 z-[400] bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-[#EAE5DF] text-[11px] font-medium text-[#252525] shadow-xs pointer-events-none">
-          👉 <strong>Bấm trực tiếp vào bản đồ</strong> hoặc kéo thả điểm đỏ 📍 để chọn vị trí
+          👉 <strong>Bấm trực tiếp vào bản đồ</strong> để chọn vị trí
         </div>
 
         {/* Current coordinates display badge */}
-        <div className="absolute bottom-2 left-2 z-[400] bg-white/95 backdrop-blur-xs px-3 py-1.5 rounded-xl border border-[#EAE5DF] text-xs font-mono font-semibold text-[#252525] shadow-xs flex items-center gap-1.5">
-          <MapPin className="w-3.5 h-3.5 text-[#FF6B4A]" />
-          <span>{currentLat.toFixed(4)}, {currentLng.toFixed(4)}</span>
-        </div>
+        {showCoordsBadge && (
+          <div className="absolute bottom-2 left-2 z-[400] bg-white/95 backdrop-blur-xs px-3 py-1.5 rounded-xl border border-[#EAE5DF] text-xs font-mono font-semibold text-[#252525] shadow-xs flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-[#FF6B4A]" />
+            <span>{currentLat.toFixed(4)}, {currentLng.toFixed(4)}</span>
+          </div>
+        )}
       </div>
     </div>
   );
