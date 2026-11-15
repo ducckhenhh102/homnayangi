@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import Container from '../../components/common/Container';
 import PageTitle from '../../components/common/PageTitle';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import ImageUpload from '../../components/common/ImageUpload';
 import MapLocationPicker from '../../components/common/MapLocationPicker';
+import Skeleton from '../../components/common/Skeleton';
 import { useAuth } from '../../context/AuthContext';
 import { fetchApi } from '../../utils/api';
-import { ArrowLeft, PlusCircle, AlertCircle, MapPin } from 'lucide-react';
+import { ArrowLeft, PlusCircle, AlertCircle, MapPin, Save } from 'lucide-react';
 
 function slugify(text) {
   return text
@@ -24,7 +25,9 @@ function slugify(text) {
 
 export default function AdminRestaurantFormPage() {
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
+  const { token, isAuthenticated, isAdmin, loading: authLoading } = useAuth();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -45,15 +48,60 @@ export default function AdminRestaurantFormPage() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(isEditMode);
   const [error, setError] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
+
+  useEffect(() => {
+    if (!authLoading && (!isAuthenticated || !isAdmin)) {
+      navigate('/admin/login');
+    }
+  }, [authLoading, isAuthenticated, isAdmin, navigate]);
+
+  // Load existing restaurant for edit mode
+  useEffect(() => {
+    if (isEditMode && token) {
+      setInitialLoading(true);
+      fetchApi(`/admin/restaurants/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => {
+          const r = res.data;
+          if (r) {
+            setFormData({
+              name: r.name || '',
+              slug: r.slug || '',
+              address: r.address || '',
+              latitude: r.latitude !== undefined && r.latitude !== null ? String(r.latitude) : '21.0285',
+              longitude: r.longitude !== undefined && r.longitude !== null ? String(r.longitude) : '105.8542',
+              priceMin: r.priceMin ? String(r.priceMin) : '',
+              priceMax: r.priceMax ? String(r.priceMax) : '',
+              status: r.status || 'PUBLISHED',
+              description: r.description || '',
+              diningTypeIds: r.diningTypes && r.diningTypes.length > 0
+                ? r.diningTypes.map((dt) => dt.diningTypeId || dt.id)
+                : ['meal'],
+              companionScores: [
+                { companionTypeId: 'couple', score: 85 },
+                { companionTypeId: 'friends', score: 90 },
+                { companionTypeId: 'solo', score: 70 },
+              ],
+            });
+          }
+        })
+        .catch((err) => {
+          setError(err.message || 'Không thể tải thông tin quán để chỉnh sửa.');
+        })
+        .finally(() => setInitialLoading(false));
+    }
+  }, [id, isEditMode, token]);
 
   const handleNameChange = (e) => {
     const val = e.target.value;
     setFormData((prev) => ({
       ...prev,
       name: val,
-      slug: prev.slug === '' || prev.slug === slugify(prev.name) ? slugify(val) : prev.slug,
+      slug: !isEditMode && (prev.slug === '' || prev.slug === slugify(prev.name)) ? slugify(val) : prev.slug,
     }));
   };
 
@@ -64,7 +112,7 @@ export default function AdminRestaurantFormPage() {
       return {
         ...prev,
         diningTypeIds: exists
-          ? prev.diningTypeIds.filter((id) => id !== dtId)
+          ? prev.diningTypeIds.filter((item) => item !== dtId)
           : [...prev.diningTypeIds, dtId],
       };
     });
@@ -87,41 +135,80 @@ export default function AdminRestaurantFormPage() {
         priceMax: formData.priceMax ? parseInt(formData.priceMax, 10) : null,
         status: formData.status,
         diningTypeIds: formData.diningTypeIds,
-        companionScores: formData.companionScores,
       };
 
-      const created = await fetchApi('/admin/restaurants', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      if (isEditMode) {
+        await fetchApi(`/admin/restaurants/${id}`, {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
 
-      // If image was uploaded to Cloudinary, attach it to the new restaurant
-      if (uploadedImage && created.data?.rawId) {
-        await fetchApi(`/admin/restaurants/${created.data.rawId}/images`, {
+        // If new image was uploaded, attach it
+        if (uploadedImage) {
+          await fetchApi(`/admin/restaurants/${id}/images`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              cloudinaryPublicId: uploadedImage.cloudinaryPublicId,
+              secureUrl: uploadedImage.secureUrl,
+              width: uploadedImage.width,
+              height: uploadedImage.height,
+              altText: `Ảnh quán ${formData.name}`,
+            }),
+          });
+        }
+      } else {
+        const created = await fetchApi('/admin/restaurants', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            cloudinaryPublicId: uploadedImage.cloudinaryPublicId,
-            secureUrl: uploadedImage.secureUrl,
-            width: uploadedImage.width,
-            height: uploadedImage.height,
-            altText: `Ảnh quán ${formData.name}`,
+            ...payload,
+            companionScores: formData.companionScores,
           }),
         });
+
+        // If image was uploaded to Cloudinary, attach it to the new restaurant
+        if (uploadedImage && created.data?.rawId) {
+          await fetchApi(`/admin/restaurants/${created.data.rawId}/images`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              cloudinaryPublicId: uploadedImage.cloudinaryPublicId,
+              secureUrl: uploadedImage.secureUrl,
+              width: uploadedImage.width,
+              height: uploadedImage.height,
+              altText: `Ảnh quán ${formData.name}`,
+            }),
+          });
+        }
       }
 
       navigate('/admin/restaurants');
     } catch (err) {
-      setError(err.message || 'Không thể tạo quán mới.');
+      setError(err.message || `Không thể ${isEditMode ? 'cập nhật' : 'tạo'} quán ăn.`);
     } finally {
       setLoading(false);
     }
   };
+
+  if (initialLoading) {
+    return (
+      <Container className="max-w-3xl py-6 space-y-6">
+        <Skeleton className="h-6 w-36" />
+        <Skeleton className="h-10 w-64" />
+        <Skeleton className="h-96 w-full rounded-3xl" />
+      </Container>
+    );
+  }
 
   return (
     <Container className="max-w-3xl py-6 space-y-6">
@@ -135,8 +222,8 @@ export default function AdminRestaurantFormPage() {
 
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#EAE5DF] shadow-sm">
         <PageTitle
-          title="Thêm quán ăn mới"
-          subtitle="Dữ liệu sẽ được lưu trực tiếp vào Neon PostgreSQL và có thể tìm kiếm ngay"
+          title={isEditMode ? `Chỉnh sửa quán: ${formData.name || 'Quán ăn'}` : 'Thêm quán ăn mới'}
+          subtitle={isEditMode ? 'Cập nhật thông tin quán trực tiếp vào cơ sở dữ liệu' : 'Dữ liệu sẽ được lưu trực tiếp vào Neon PostgreSQL và có thể tìm kiếm ngay'}
           className="text-left"
         />
 
@@ -201,6 +288,9 @@ export default function AdminRestaurantFormPage() {
 
           {/* Image Upload */}
           <div className="p-4 bg-neutral-50 rounded-2xl border border-[#EAE5DF]">
+            <span className="block text-xs font-bold text-[#252525] uppercase mb-2">
+              {isEditMode ? 'Tải thêm ảnh mới cho quán (Tùy chọn)' : 'Ảnh đại diện quán'}
+            </span>
             <ImageUpload
               token={token}
               onUploadSuccess={(res) => setUploadedImage(res)}
@@ -270,6 +360,7 @@ export default function AdminRestaurantFormPage() {
               className="w-full min-h-[44px] px-3.5 py-2.5 bg-white border border-[#EAE5DF] rounded-xl text-[#252525] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
             >
               <option value="PUBLISHED">Công khai (Hiển thị ngay cho người dùng)</option>
+              <option value="HIDDEN">Đã ẩn (Ẩn khỏi kết quả tìm kiếm)</option>
               <option value="DRAFT">Bản nháp (Chưa hiển thị)</option>
             </select>
           </div>
@@ -293,8 +384,17 @@ export default function AdminRestaurantFormPage() {
               <Button variant="secondary">Hủy bỏ</Button>
             </Link>
             <Button type="submit" variant="primary" isLoading={loading}>
-              <PlusCircle className="w-4 h-4 mr-2" />
-              Lưu quán ăn mới
+              {isEditMode ? (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Lưu thay đổi quán ăn
+                </>
+              ) : (
+                <>
+                  <PlusCircle className="w-4 h-4 mr-2" />
+                  Lưu quán ăn mới
+                </>
+              )}
             </Button>
           </div>
         </form>

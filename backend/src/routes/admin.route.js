@@ -51,7 +51,7 @@ router.get('/admin/restaurants', async (req, res, next) => {
       prisma.restaurant.findMany({
         skip,
         take: limit,
-        orderBy: { updatedAt: 'desc' },
+        orderBy: [{ status: 'asc' }, { updatedAt: 'desc' }],
         include: {
           diningTypes: true,
           companionTypes: true,
@@ -71,6 +71,32 @@ router.get('/admin/restaurants', async (req, res, next) => {
         totalPages: Math.ceil(total / limit),
       },
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 1b. Get single restaurant for editing
+router.get('/admin/restaurants/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const item = await prisma.restaurant.findUnique({
+      where: { id },
+      include: {
+        diningTypes: true,
+        companionTypes: true,
+        images: { orderBy: { sortOrder: 'asc' } },
+        foods: { include: { food: true } },
+      },
+    });
+
+    if (!item) {
+      return res.status(404).json({
+        error: { code: 'NOT_FOUND', message: 'Không tìm thấy quán ăn.' },
+      });
+    }
+
+    res.status(200).json({ data: item });
   } catch (err) {
     next(err);
   }
@@ -157,17 +183,37 @@ router.patch('/admin/restaurants/:id', async (req, res, next) => {
       });
     }
 
+    // If slug is changed, check uniqueness
+    if (body.slug && body.slug !== existing.slug) {
+      const slugExists = await prisma.restaurant.findUnique({
+        where: { slug: body.slug },
+      });
+      if (slugExists) {
+        return res.status(400).json({
+          error: {
+            code: 'SLUG_EXISTS',
+            message: `Slug '${body.slug}' đã tồn tại. Vui lòng chọn slug khác.`,
+          },
+        });
+      }
+    }
+
     const updated = await prisma.restaurant.update({
       where: { id },
       data: {
-        name: body.name !== undefined ? body.name : undefined,
-        description: body.description !== undefined ? body.description : undefined,
-        address: body.address !== undefined ? body.address : undefined,
-        latitude: body.latitude !== undefined ? body.latitude : undefined,
-        longitude: body.longitude !== undefined ? body.longitude : undefined,
-        priceMin: body.priceMin !== undefined ? body.priceMin : undefined,
-        priceMax: body.priceMax !== undefined ? body.priceMax : undefined,
+        name: body.name !== undefined ? body.name.trim() : undefined,
+        slug: body.slug !== undefined ? body.slug.trim() : undefined,
+        description: body.description !== undefined ? (body.description?.trim() || null) : undefined,
+        address: body.address !== undefined ? body.address.trim() : undefined,
+        latitude: body.latitude !== undefined ? Number(body.latitude) : undefined,
+        longitude: body.longitude !== undefined ? Number(body.longitude) : undefined,
+        priceMin: body.priceMin !== undefined ? (body.priceMin ? Number(body.priceMin) : null) : undefined,
+        priceMax: body.priceMax !== undefined ? (body.priceMax ? Number(body.priceMax) : null) : undefined,
         status: body.status !== undefined ? body.status : undefined,
+        diningTypes: body.diningTypeIds ? {
+          deleteMany: {},
+          create: body.diningTypeIds.map((dtId) => ({ diningTypeId: dtId })),
+        } : undefined,
       },
       include: {
         diningTypes: true,
@@ -179,6 +225,29 @@ router.patch('/admin/restaurants/:id', async (req, res, next) => {
     res.status(200).json({
       data: formatRestaurant(updated),
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 3b. Quick status toggle (PUBLISHED <-> HIDDEN) without touching other fields
+router.patch('/admin/restaurants/:id/status', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    if (!['PUBLISHED', 'HIDDEN', 'DRAFT'].includes(status)) {
+      return res.status(400).json({
+        error: { message: 'Trạng thái không hợp lệ. Chỉ chấp nhận PUBLISHED, HIDDEN, DRAFT.' },
+      });
+    }
+
+    const updated = await prisma.restaurant.update({
+      where: { id },
+      data: { status },
+      select: { id: true, name: true, status: true, updatedAt: true },
+    });
+
+    res.status(200).json({ data: updated });
   } catch (err) {
     next(err);
   }

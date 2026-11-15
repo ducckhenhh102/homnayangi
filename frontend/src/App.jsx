@@ -28,6 +28,7 @@ export default function App() {
               <Route path="/admin/login" element={<AdminLoginPage />} />
               <Route path="/admin/restaurants" element={<AdminRestaurantsPage />} />
               <Route path="/admin/restaurants/new" element={<AdminRestaurantFormPage />} />
+              <Route path="/admin/restaurants/:id/edit" element={<AdminRestaurantFormPage />} />
               <Route path="/admin/submissions" element={<AdminSubmissionsPage />} />
               <Route path="/submit-restaurant" element={<SubmitRestaurantPage />} />
               <Route path="*" element={<NotFoundPage />} />
