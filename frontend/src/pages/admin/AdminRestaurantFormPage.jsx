@@ -156,12 +156,19 @@ export default function AdminRestaurantFormPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    const trimmedName = (formData.name || '').trim();
+    if (!trimmedName || trimmedName.length < 2) {
+      setError('Vui lòng nhập Tên quán ăn (tối thiểu 2 ký tự).');
+      return;
+    }
+
     setLoading(true);
 
     try {
       const parsedLat = parseFloat(formData.latitude) || 21.0285;
       const parsedLng = parseFloat(formData.longitude) || 105.8542;
-      const finalAddress = formData.address.trim().length >= 5
+      const finalAddress = (formData.address && formData.address.trim().length >= 5)
         ? formData.address.trim()
         : `Tọa độ ${parsedLat.toFixed(4)}, ${parsedLng.toFixed(4)}, Hà Nội`;
 
@@ -173,17 +180,21 @@ export default function AdminRestaurantFormPage() {
           category: f.category || 'Món đặc trưng',
         }));
 
+      const activeDiningTypes = formData.diningTypeIds && formData.diningTypeIds.length > 0
+        ? formData.diningTypeIds
+        : ['meal'];
+
       const payload = {
-        name: formData.name.trim(),
-        slug: slugify(formData.slug) || slugify(formData.name) || `quan-${Date.now()}`,
+        name: trimmedName,
+        slug: slugify(formData.slug) || slugify(trimmedName) || `quan-${Date.now()}`,
         address: finalAddress,
         latitude: parsedLat,
         longitude: parsedLng,
-        description: formData.description.trim() || null,
+        description: formData.description ? formData.description.trim() : null,
         priceMin: formData.priceMin ? parseInt(formData.priceMin, 10) : null,
         priceMax: formData.priceMax ? parseInt(formData.priceMax, 10) : null,
-        status: formData.status,
-        diningTypeIds: formData.diningTypeIds,
+        status: formData.status || 'PUBLISHED',
+        diningTypeIds: activeDiningTypes,
         foodItems: validFoods,
       };
 
@@ -311,11 +322,10 @@ export default function AdminRestaurantFormPage() {
           </div>
 
           <Input
-            label="Địa chỉ chi tiết *"
-            placeholder="Số nhà, đường, phường/quận, thành phố"
+            label="Địa chỉ chi tiết (Tùy chọn - nếu không có địa chỉ cụ thể chỉ cần ghim trên bản đồ)"
+            placeholder="Số nhà, tên đường, phố hoặc để trống (sẽ tự động dùng điểm ghim trên bản đồ)"
             value={formData.address}
             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            required
           />
 
           {/* Coordinates Map Picker */}
