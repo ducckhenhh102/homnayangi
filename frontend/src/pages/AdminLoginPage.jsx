@@ -83,9 +83,7 @@ export default function AdminLoginPage() {
           </Button>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-[#EAE5DF] text-center text-xs text-[#6B6B6B]">
-          Tài khoản quản trị: <code className="bg-neutral-100 px-1.5 py-0.5 rounded font-mono font-semibold text-[#252525]">admin</code> / <code className="bg-neutral-100 px-1.5 py-0.5 rounded font-mono font-semibold text-[#252525]">admin</code>
-        </div>
+        
       </div>
     </Container>
   );
