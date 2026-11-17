@@ -59,7 +59,7 @@ export default function AdminLoginPage() {
           <Input
             label="Tài khoản hoặc Email quản trị"
             type="text"
-            placeholder="admin hoặc admin@homnayangi.vn"
+            placeholder=""
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -67,7 +67,7 @@ export default function AdminLoginPage() {
           <Input
             label="Mật khẩu"
             type="password"
-            placeholder="admin"
+            placeholder=""
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
