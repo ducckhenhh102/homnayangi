@@ -10,8 +10,8 @@ import { ShieldCheck, AlertCircle } from 'lucide-react';
 export default function AdminLoginPage() {
   const navigate = useNavigate();
   const { login, isAuthenticated, isAdmin } = useAuth();
-  const [email, setEmail] = useState('admin');
-  const [password, setPassword] = useState('admin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -55,21 +55,23 @@ export default function AdminLoginPage() {
           </div>
         )}
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit} autoComplete="off">
           <Input
             label="Tài khoản hoặc Email quản trị"
             type="text"
-            placeholder=""
+            placeholder="Nhập tài khoản admin..."
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            autoComplete="off"
             required
           />
           <Input
             label="Mật khẩu"
             type="password"
-            placeholder=""
+            placeholder="Nhập mật khẩu..."
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
             required
           />
 
