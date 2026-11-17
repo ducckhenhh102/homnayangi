@@ -10,8 +10,8 @@ import { ShieldCheck, AlertCircle } from 'lucide-react';
 export default function AdminLoginPage() {
   const navigate = useNavigate();
   const { login, isAuthenticated, isAdmin } = useAuth();
-  const [email, setEmail] = useState('admin@homnayangi.vn');
-  const [password, setPassword] = useState('Admin@123456');
+  const [email, setEmail] = useState('admin');
+  const [password, setPassword] = useState('admin');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -57,8 +57,9 @@ export default function AdminLoginPage() {
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <Input
-            label="Email quản trị"
-            type="email"
+            label="Tài khoản hoặc Email quản trị"
+            type="text"
+            placeholder="admin hoặc admin@homnayangi.vn"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -66,6 +67,7 @@ export default function AdminLoginPage() {
           <Input
             label="Mật khẩu"
             type="password"
+            placeholder="admin"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -82,7 +84,7 @@ export default function AdminLoginPage() {
         </form>
 
         <div className="mt-6 pt-4 border-t border-[#EAE5DF] text-center text-xs text-[#6B6B6B]">
-          Tài khoản mặc định: <code className="bg-neutral-100 px-1 py-0.5 rounded font-mono">admin@homnayangi.vn</code>
+          Tài khoản quản trị: <code className="bg-neutral-100 px-1.5 py-0.5 rounded font-mono font-semibold text-[#252525]">admin</code> / <code className="bg-neutral-100 px-1.5 py-0.5 rounded font-mono font-semibold text-[#252525]">admin</code>
         </div>
       </div>
     </Container>

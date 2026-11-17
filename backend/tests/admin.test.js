@@ -46,7 +46,7 @@ test('Login with correct password returns 200 and JWT token', async () => {
   const res = await fetch(`${baseUrl}/api/v1/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: 'admin@homnayangi.vn', password: 'Admin@123456' }),
+    body: JSON.stringify({ email: 'admin', password: 'admin' }),
   });
   assert.equal(res.status, 200);
   const body = await res.json();
